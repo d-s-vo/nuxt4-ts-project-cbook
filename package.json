@@ -1,0 +1,40 @@
+{
+  "name": "vue-ts-cbook",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "description": "Modern Vue.js boilerplate with Nuxt 4, TypeScript, Tailwind CSS, and Nuxt UI 4",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "typecheck": "nuxt typecheck"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "dependencies": {
+    "@nuxt/ui": "^3.3.3",
+    "@vueuse/core": "^13.9.0",
+    "@vueuse/nuxt": "^13.9.0",
+    "nuxt": "^4.1.1",
+    "vue": "^3.5.21",
+    "vue-router": "^4.5.1"
+  },
+  "devDependencies": {
+    "@nuxtjs/tailwindcss": "^6.14.0",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14",
+    "typescript": "^5.5.4"
+  },
+  "keywords": [
+    "vue",
+    "nuxt",
+    "typescript",
+    "tailwind",
+    "composition-api"
+  ],
+  "author": "",
+  "license": "MIT"
+}
