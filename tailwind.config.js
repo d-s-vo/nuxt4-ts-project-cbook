@@ -10,7 +10,12 @@ export default {
     "./app.vue"
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        'playfair': ['Playfair Display', 'serif'],
+        'dancing': ['Dancing Script', 'cursive'],
+      }
+    },
   },
   plugins: [],
 }
