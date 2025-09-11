@@ -1,9 +1,5 @@
 <template>
-    <div
-        class="
-            max-w-[800px] mx-auto
-        "
-    >
+    <div class="max-w-[800px] mx-auto">
         <h1
             class="
                 text-[36px] font-bold underline font-dancing
@@ -13,17 +9,30 @@
             Recipes:
         </h1>
 
-        <div>{{ recipes }}</div>
+        <div class="flex flex-col gap-[20px]">
+            <template 
+                v-for="recipe in getAllRecipes" 
+                :key="recipe.id"
+            >
+                <recipe-card 
+                    :recipe="recipe"
+                    class="
+                        [&:not(:first-child)]:border-t-[1px] [&:not(:first-child)]:pt-[20px]
+                        border-[#e0e0e0]
+                    "
+                />
+            </template>
+        </div>
     </div>
 </template>
 <script setup lang="ts">
 import { useRecipes } from "~/composables/useRecipes";
+
 const {
     getAllRecipes,
     getRecipesByTitle,
     getRecipeById,
     deleteRecipe,
-    addRecipe,
-    recipes
+    addRecipe
 } = useRecipes();
 </script>
