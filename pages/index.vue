@@ -12,7 +12,18 @@
         >
             Recipes:
         </h1>
+
+        <div>{{ recipes }}</div>
     </div>
 </template>
-<script lang="ts">
+<script setup lang="ts">
+import { useRecipes } from "~/composables/useRecipes";
+const {
+    getAllRecipes,
+    getRecipesByTitle,
+    getRecipeById,
+    deleteRecipe,
+    addRecipe,
+    recipes
+} = useRecipes();
 </script>
