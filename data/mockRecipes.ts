@@ -36,7 +36,7 @@ export const mockRecipes: Recipe[] = [
             "Вылить в смазанную форму",
             "Выпекать 25-30 минут при 180°C"
         ],
-        imageUrl: "",
+        imageUrl: "/images/applepie.jpg",
         servings: 1,
     },
     {
@@ -79,7 +79,7 @@ export const mockRecipes: Recipe[] = [
             "Выпекать 35-40 минут при 180°C",
             "Можно добавить ягоды или яблоки"
         ],
-        imageUrl: "",
+        imageUrl: "/images/mannik.jpg",
         servings: 1,
     }
 ]
