@@ -1,17 +1,23 @@
 <template>
     <div class="max-w-[800px] mx-auto">
-        <h1
-            class="
-                text-[36px] font-bold underline font-dancing
-                leading-[1.3] bg-[#f0f0f0] p-[20px]
-            "
+        <div
+            class="flex items-center justify-between gap-[20px] bg-[#f0f0f0] p-[20px]"
         >
-            Recipes:
-        </h1>
+            <h1 class="text-[36px] font-bold underline font-dancing leading-[1.3]">
+                Recipes:
+            </h1>
 
-        <div class="flex flex-col gap-[20px]">
+            <input
+                type="text"
+                v-model="searchQuery"
+                placeholder="Search recipes..."
+                class="p-[10px] border-[1px] border-[#e0e0e0] rounded-[10px]"
+            />
+        </div>
+
+        <div class="flex flex-col gap-[20px] mt-[20px] [@media(max-width:805px)]:px-[10px]">
             <template 
-                v-for="recipe in getAllRecipes" 
+                v-for="recipe in filteredRecipes" 
                 :key="recipe.id"
             >
                 <recipe-card 
@@ -27,12 +33,25 @@
 </template>
 <script setup lang="ts">
 import { useRecipes } from "~/composables/useRecipes";
+import { ref, computed } from "vue";
+import type { Recipe } from '~/types';
 
 const {
     getAllRecipes,
     getRecipesByTitle,
-    getRecipeById,
-    deleteRecipe,
-    addRecipe
+    getRecipeById
 } = useRecipes();
+
+const searchQuery = ref('');
+const filteredRecipes = computed<Recipe[]>(() => {
+    const query = searchQuery.value.trim();
+    if (!query) return getAllRecipes.value;
+    const id = parseInt(query);
+    if (!isNaN(id)) {
+        const recipe = getRecipeById(id);
+        if (recipe) return [recipe];
+    };
+    return getRecipesByTitle(query);
+});
+
 </script>
