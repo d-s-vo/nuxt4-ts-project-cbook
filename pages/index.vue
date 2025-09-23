@@ -28,6 +28,8 @@
                     "
                 />
             </template>
+
+            <a href="/add-recipe" class="text-[#007bff] hover:underline">Add new recipe</a>
         </div>
     </div>
 </template>
