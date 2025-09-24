@@ -21,5 +21,5 @@ export interface Recipe {
   difficulty: Difficulty;
   ingredients: Ingredient[];
   steps: string[]; // Массив строк с шагами приготовления
-  imageUrl: string; // Ссылка на изображение (можно использовать локальные файлы из /public)
+  imageUrl?: string; // Ссылка на изображение (можно использовать локальные файлы из /public)
 }
