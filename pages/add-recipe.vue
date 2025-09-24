@@ -294,10 +294,6 @@ input[type="number"]::-webkit-outer-spin-button {
   margin: 0;
 }
 
-input[type="number"] {
-  -moz-appearance: textfield;
-}
-
 /* Анимация появления/скрытия элементов */
 .fade-enter-active,
 .fade-leave-active {
