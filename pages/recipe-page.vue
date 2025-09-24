@@ -60,6 +60,17 @@
                     </ol>
                 </div>
             </div>
+
+            <div
+                @click="deleteRecipe(recipe.id) && router.push('/')"
+                class="
+                    text-red-600 cursor-pointer mx-auto w-[60%] mb-[20px]
+                    rounded-[20px] hover:bg-red-600 hover:text-white transition-colors
+                    p-[20px] text-[24px] font-semibold text-center
+                "
+            >
+                Удалить рецепт
+            </div>
         </div>
 
         <div v-else-if="loading" class="text-center py-12">
@@ -76,10 +87,11 @@
 import { useRecipes } from '~/composables/useRecipes';
 import type { Recipe } from '~/types';
 import { ref, onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
-const { getRecipeById } = useRecipes();
+const router = useRouter();
+const { getRecipeById, deleteRecipe } = useRecipes();
 
 const recipe = ref<Recipe | null>(null);
 const loading = ref(true);
