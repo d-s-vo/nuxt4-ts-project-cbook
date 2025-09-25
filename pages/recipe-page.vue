@@ -86,7 +86,7 @@
 <script setup lang="ts">
 import { useRecipes } from '~/composables/useRecipes';
 import type { Recipe } from '~/types';
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
@@ -106,17 +106,16 @@ watch(() => route.query.id, () => {
     loadRecipe();
 });
 
-const loadRecipe = () => {
+const loadRecipe = async () => {
     const recipeId = Number(route.query.id);
     loading.value = true;
     
+    await nextTick();
+
     if (!isNaN(recipeId)) {
-        // Имитируем задержку загрузки
-        setTimeout(() => {
-            const foundRecipe = getRecipeById(recipeId);
-            recipe.value = foundRecipe || null;
-            loading.value = false;
-        }, 300);
+        const foundRecipe = getRecipeById(recipeId);
+        recipe.value = foundRecipe || null;
+        loading.value = false;
     } else {
         loading.value = false;
     }
