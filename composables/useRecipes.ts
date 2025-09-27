@@ -1,37 +1,59 @@
-import { ref, computed, onMounted } from 'vue';
+import { computed, onMounted, watch, onUnmounted, ref } from 'vue';
+import { useState } from 'nuxt/app';
 import type { Recipe } from '../types';
 import { mockRecipes } from '../data/mockRecipes';
 
 const STORAGE_KEY = 'recipe-app-recipes';
 
 export const useRecipes = () => {
-    // Load recipes from localStorage or use mock data
-    const loadRecipes = (): Recipe[] => {
-        try {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            return saved ? JSON.parse(saved) : [...mockRecipes];
-        } catch (e) {
-            console.error('Failed to load recipes:', e);
-            return [...mockRecipes];
+    // Use a ref to track initialization
+    const isInitialized = ref(false);
+    
+    // Use useState with a factory function for SSR support
+    const recipes = useState<Recipe[]>('recipes', () => []);
+
+    // Initialize recipes only once
+    const initializeRecipes = () => {
+        if (isInitialized.value) return;
+        
+        if (process.client) {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                recipes.value = saved ? JSON.parse(saved) : [...mockRecipes];
+            } catch (e) {
+                console.error('Failed to load recipes:', e);
+                recipes.value = [...mockRecipes];
+            }
+        } else {
+            recipes.value = [...mockRecipes];
         }
+        
+        isInitialized.value = true;
     };
 
-    // Reactive state
-    const recipes = ref<Recipe[]>([]);
-
-    // Initialize from localStorage
-    onMounted(() => {
-        recipes.value = loadRecipes();
-    });
-
     // Save recipes to localStorage
-    const saveRecipes = () => {
+    const saveToLocalStorage = () => {
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes.value));
         } catch (e) {
             console.error('Failed to save recipes:', e);
         }
     };
+
+    // Initialize on mount
+    onMounted(() => {
+        initializeRecipes();
+        
+        // Setup watcher
+        const stopWatcher = watch(() => [...recipes.value], () => {
+            saveToLocalStorage();
+        }, { deep: true });
+
+        // Cleanup on unmount
+        onUnmounted(() => {
+            stopWatcher();
+        });
+    });
 
     // Add new recipe with auto-increment ID
     const addRecipe = (newRecipe: Omit<Recipe, 'id'>): Recipe => {
@@ -45,8 +67,7 @@ export const useRecipes = () => {
             imageUrl: newRecipe.imageUrl || '/images/placeholder.jpg'
         };
 
-        recipes.value.push(recipe);
-        saveRecipes();
+        recipes.value = [...recipes.value, recipe];
         return recipe;
     };
 
@@ -72,11 +93,7 @@ export const useRecipes = () => {
     const deleteRecipe = (id: number): boolean => {
         const initialLength = recipes.value.length;
         recipes.value = recipes.value.filter(recipe => recipe.id !== id);
-        if (recipes.value.length !== initialLength) {
-            saveRecipes();
-            return true;
-        }
-        return false;
+        return recipes.value.length !== initialLength;
     };
 
     return {
