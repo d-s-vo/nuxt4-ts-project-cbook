@@ -2,23 +2,27 @@
     <div
         v-if="recipe"
         @click.prevent="navigateToRecipe(recipe.id)"
-        class="cursor-pointer flex gap-[20px] group"
+        class="cursor-pointer group"
     >
-        <img
-            v-if="recipe.imageUrl" 
-            :src="recipe.imageUrl" 
-            :alt="recipe.title"
-            class="max-w-[100px] aspect-square shrink-0 rounded-[10px]"
+        <div
+            class="flex gap-[20px] group-hover:bg-[#f0f0f0] p-[20px] rounded-[10px]"
         >
-        <div>
-            <h2
-                v-if="recipe?.title"
-                class="text-[24px] font-bold group-hover:underline"
+            <img
+                v-if="recipe.imageUrl" 
+                :src="recipe.imageUrl" 
+                :alt="recipe.title"
+                class="max-w-[100px] aspect-square shrink-0 rounded-[10px]"
             >
-                {{ recipe.title }}
-            </h2>
-            <div>Время приготовления: {{ recipe.cookingTime }} минут</div>
-            <div>Сложность: {{ recipe.difficulty }}</div>
+            <div>
+                <h2
+                    v-if="recipe?.title"
+                    class="text-[24px] font-bold group-hover:underline"
+                >
+                    {{ recipe.title }}
+                </h2>
+                <div>Время приготовления: {{ recipe.cookingTime }} минут</div>
+                <div>Сложность: {{ recipe.difficulty }}</div>
+            </div>
         </div>
     </div>
 </template>
