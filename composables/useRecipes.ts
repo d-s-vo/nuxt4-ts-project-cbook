@@ -71,9 +71,6 @@ export const useRecipes = () => {
         return recipe;
     };
 
-    // Get all recipes (computed for reactivity)
-    const getAllRecipes = computed(() => [...recipes.value]);
-
     // Get recipe by ID
     const getRecipeById = (id: number): Recipe | undefined => {
         return recipes.value.find(recipe => recipe.id === id);
@@ -98,7 +95,6 @@ export const useRecipes = () => {
 
     return {
         recipes,
-        getAllRecipes,
         addRecipe,
         getRecipeById,
         getRecipesByTitle,

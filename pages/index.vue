@@ -38,8 +38,9 @@ import { useRecipes } from "~/composables/useRecipes";
 import { ref, computed } from "vue";
 import type { Recipe } from '~/types';
 
+const {recipes} = useRecipes();
+
 const {
-    getAllRecipes,
     getRecipesByTitle,
     getRecipeById
 } = useRecipes();
@@ -47,7 +48,7 @@ const {
 const searchQuery = ref('');
 const filteredRecipes = computed<Recipe[]>(() => {
     const query = searchQuery.value.trim();
-    if (!query) return getAllRecipes.value;
+    if (!query) return recipes.value;
     const id = parseInt(query);
     if (!isNaN(id)) {
         const recipe = getRecipeById(id);
