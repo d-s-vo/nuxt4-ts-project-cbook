@@ -9,27 +9,45 @@
         :key="field.type"
       >
         <div class="bg-white p-6 rounded-lg shadow-md">
-          <h2 class="text-xl font-semibold mb-4">{{ field.title }}</h2>
-          <div
-            v-if="field?.items?.length"
-            class=""
-          >
-            <template
-              v-for="item in field.items"
-              :key="item.name"
+          <template v-if="field?.type === 'main'">
+            <h2 class="text-xl font-semibold mb-4">{{ field.title }}</h2>
+            <div
+              v-if="field?.items?.length"
+              class="grid grid-cols-1 md:grid-cols-2 gap-[20px]"
             >
-             <div>
-              <div>{{ item.title }}</div>
-              <form-input
-                v-model="form[item.name]"
-                :type="item.type"
-              />
-             </div>
-            </template>
-          </div>
+              <template
+                v-for="item in field.items"
+                :key="item.name"
+              >
+              <div
+                :class="{
+                  'col-span-2': item.type === 'textarea' || item.name === 'imageUrl'
+                }"
+              >
+                <div
+                  class="text-lg font-semibold mb-2 w-full"
+                >
+                    {{ item.title }}
+                </div>
+                <form-input
+                  v-if="['text', 'textarea', 'number'].includes(item.type)"
+                  v-model="form[item.name]"
+                  :type="item.type"
+                  class="w-full"
+                />
+
+                <input-select
+                  v-if="item.type === 'select'"
+                  v-model="form[item.name]"
+                  :options="item.options"
+                  class="w-full"
+                />
+              </div>
+              </template>
+            </div>
+          </template>
         </div>
       </template>
-      
 
       <!-- Кнопки формы -->
       <div class="flex justify-end space-x-4">
@@ -159,7 +177,7 @@ const formFields = [
         }
     ]
   }
-]
+];
 
 const form = ref<Omit<Recipe, 'id'>>({
   title: '',
