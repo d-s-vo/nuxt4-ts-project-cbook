@@ -39,7 +39,7 @@
                 <input-select
                   v-if="item.type === 'select'"
                   v-model="form[item.name]"
-                  :options="item.options"
+                  :options="(item as SelectField<typeof item.name>).options"
                   class="w-full"
                 />
               </div>
@@ -74,7 +74,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import type { Recipe, Ingredient, Unit } from '~/types';
+import type { Recipe, Ingredient, Unit, FormGroup, SelectField } from '~/types';
 import { useRecipes } from '~/composables/useRecipes';
 
 const router = useRouter();
@@ -83,7 +83,7 @@ const { addRecipe } = useRecipes();
 const units: Unit[] = ['г', 'кг', 'мл', 'л', 'шт', 'ст.л.', 'ч.л.', 'по вкусу'];
 const isSubmitting = ref(false);
 
-const formFields = [
+const formFields: FormGroup[] = [
   {
     "title": "Основная информация",
     "type": "main",
@@ -145,23 +145,32 @@ const formFields = [
     "type": "ingredients",
     "items": [
         {
-            "type": "text",
-            "name": "name",
-            "title": "Название",
-            "required": true
+          "type": "text",
+          "name": "name",
+          "title": "Название",
+          "required": true
         },
         {
-            "type": "number",
-            "name": "quantity",
-            "title": "Количество",
-            "required": true
+          "type": "number",
+          "name": "quantity",
+          "title": "Количество",
+          "required": true
         },
         {
-            "type": "select",
-            "name": "unit",
-            "title": "Единица измерения",
-            "options": units,
-            "required": true
+          "type": "select",
+          "name": "unit",
+          "title": "Единица измерения",
+          "options": [
+            { value: 'г', title: 'Граммы' },
+            { value: 'кг', title: 'Килограммы' },
+            { value: 'мл', title: 'Миллилитры' },
+            { value: 'л', title: 'Литры' },
+            { value: 'шт', title: 'Штуки' },
+            { value: 'ст.л.', title: 'Столовые ложки' },
+            { value: 'ч.л.', title: 'Чайные ложки' },
+            { value: 'по вкусу', title: 'По вкусу' }
+          ],
+          "required": true
         }
     ]
   },
@@ -170,10 +179,10 @@ const formFields = [
     "type": "steps",
     "items": [
         {
-            "type": "textarea",
-            "name": "name",
-            "title": "Шаг",
-            "required": true
+          "type": "textarea",
+          "name": "step",
+          "title": "Шаг",
+          "required": true
         }
     ]
   }

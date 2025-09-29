@@ -1,23 +1,47 @@
-import type { Recipe } from './index.d.ts';
+import type { Recipe, Ingredient } from './recipe.types';
 
-export type RecipeFormKeys = keyof Recipe;
+// --- ключи главной секции (без вложенности)
+export type MainKeys = keyof Omit<Recipe, 'id' | 'ingredients' | 'steps'>;
 
-interface BaseField<T extends RecipeFormKeys = RecipeFormKeys> {
-  type: 'text' | 'number' | 'textarea';
-  name: T;
+// --- ключи ингредиентов
+export type IngredientKeys = keyof Ingredient;
+
+// --- шаги (массив строк)
+export type StepKeys = 'step';
+
+// --- Общие поля формы ---
+interface BaseField<TName extends string = string> {
+  type: 'text' | 'number' | 'textarea' | 'select';
+  name: TName;
   title: string;
   required?: boolean;
 }
 
-export interface SelectField<T extends RecipeFormKeys = RecipeFormKeys> extends BaseField<T> {
+export interface SelectField<TName extends string = string> extends BaseField<TName> {
   type: 'select';
   options: { value: string; title: string }[];
 }
 
-export type Field = BaseField | SelectField;
+export type Field<TName extends string = string> = BaseField<TName> | SelectField<TName>;
 
-export interface FormGroup {
+// --- Группы ---
+export interface MainGroup {
   title: string;
-  type: 'main' | 'ingredients' | 'steps';
-  items: Field[];
+  type: 'main';
+  items: Field<MainKeys>[];
 }
+
+export interface IngredientsGroup {
+  title: string;
+  type: 'ingredients';
+  items: Field<IngredientKeys>[];
+}
+
+export interface StepsGroup {
+  title: string;
+  type: 'steps';
+  items: Field<StepKeys>[];
+}
+
+// --- Общий тип ---
+export type FormGroup = MainGroup | IngredientsGroup | StepsGroup;
