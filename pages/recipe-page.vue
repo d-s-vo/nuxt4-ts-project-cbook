@@ -62,7 +62,7 @@
             </div>
 
             <div
-                @click="deleteRecipe(recipe.id) && router.push('/')"
+                @click="deleteRecipe(recipe.id) && $router.push('/')"
                 class="
                     text-red-600 cursor-pointer mx-auto w-[60%] mb-[20px]
                     rounded-[20px] hover:bg-red-600 hover:text-white transition-colors
@@ -87,10 +87,9 @@
 import { useRecipes } from '~/composables/useRecipes';
 import type { Recipe } from '~/types';
 import { ref, onMounted, watch, nextTick } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 
 const route = useRoute();
-const router = useRouter();
 const { getRecipeById, deleteRecipe } = useRecipes();
 
 const recipe = ref<Recipe | null>(null);
