@@ -3,183 +3,33 @@
     <h1 class="text-3xl font-bold mb-8 text-center">Добавить новый рецепт</h1>
     
     <form @submit.prevent="submitForm" class="space-y-6">
-      <!-- Основная информация -->
-      <div class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-semibold mb-4">Основная информация</h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Название рецепта *</label>
-            <input
-              id="title"
-              v-model="form.title"
-              type="text"
-              required
-              class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-          </div>
-
-          <div>
-            <label for="cookingTime" class="block text-sm font-medium text-gray-700 mb-1">Время приготовления (минут) *</label>
-            <input
-              id="cookingTime"
-              v-model.number="form.cookingTime"
-              type="number"
-              min="1"
-              required
-              class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-          </div>
-
-          <div>
-            <label for="servings" class="block text-sm font-medium text-gray-700 mb-1">Количество порций *</label>
-            <input
-              id="servings"
-              v-model.number="form.servings"
-              type="number"
-              min="1"
-              required
-              class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-          </div>
-
-          <div>
-            <label for="difficulty" class="block text-sm font-medium text-gray-700 mb-1">Сложность *</label>
-            <select
-              id="difficulty"
-              v-model="form.difficulty"
-              required
-              class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="легко">Легко</option>
-              <option value="средне">Средне</option>
-              <option value="сложно">Сложно</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="mt-4">
-          <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Описание *</label>
-          <textarea
-            id="description"
-            v-model="form.description"
-            rows="3"
-            required
-            class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          ></textarea>
-        </div>
-
-        <div class="mt-4">
-          <label for="imageUrl" class="block text-sm font-medium text-gray-700 mb-1">Ссылка на изображение</label>
-          <input
-            id="imageUrl"
-            v-model="form.imageUrl"
-            type="text"
-            placeholder="/images/recipe.jpg"
-            class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      <!-- Разделы формы --> 
+      <template
+        v-for="field in formFields"
+        :key="field.type"
+      >
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-xl font-semibold mb-4">{{ field.title }}</h2>
+          <div
+            v-if="field?.items?.length"
+            class=""
           >
-        </div>
-      </div>
-
-      <!-- Ингредиенты -->
-      <div class="bg-white p-6 rounded-lg shadow-md">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-semibold">Ингредиенты</h2>
-          <button
-            type="button"
-            @click="addIngredient"
-            class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
-          >
-            + Добавить ингредиент
-          </button>
-        </div>
-
-        <div v-for="(ingredient, index) in form.ingredients" :key="index" class="grid grid-cols-12 gap-3 mb-3 items-end">
-          <div class="col-span-5">
-            <label :for="'ingredient-name-' + index" class="block text-sm font-medium text-gray-700 mb-1">Название *</label>
-            <input
-              :id="'ingredient-name-' + index"
-              v-model="ingredient.name"
-              type="text"
-              required
-              class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            <template
+              v-for="item in field.items"
+              :key="item.name"
             >
-          </div>
-          
-          <div class="col-span-2">
-            <label :for="'ingredient-quantity-' + index" class="block text-sm font-medium text-gray-700 mb-1">Количество *</label>
-            <input
-              :id="'ingredient-quantity-' + index"
-              v-model.number="ingredient.quantity"
-              type="number"
-              step="0.01"
-              min="0"
-              required
-              class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-          </div>
-          
-          <div class="col-span-3">
-            <label :for="'ingredient-unit-' + index" class="block text-sm font-medium text-gray-700 mb-1">Единица измерения *</label>
-            <select
-              :id="'ingredient-unit-' + index"
-              v-model="ingredient.unit"
-              required
-              class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option v-for="unit in units" :key="unit" :value="unit">{{ unit }}</option>
-            </select>
-          </div>
-          
-          <div class="col-span-2">
-            <button
-              type="button"
-              @click="removeIngredient(index)"
-              class="w-full p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
-              :disabled="form.ingredients.length <= 1"
-              :class="{ 'opacity-50 cursor-not-allowed': form.ingredients.length <= 1 }"
-            >
-              Удалить
-            </button>
+             <div>
+              <div>{{ item.title }}</div>
+              <form-input
+                v-model="form[item.name]"
+                :type="item.type"
+              />
+             </div>
+            </template>
           </div>
         </div>
-      </div>
-
-      <!-- Шаги приготовления -->
-      <div class="bg-white p-6 rounded-lg shadow-md">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-semibold">Шаги приготовления</h2>
-          <button
-            type="button"
-            @click="addStep"
-            class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
-          >
-            + Добавить шаг
-          </button>
-        </div>
-
-        <div v-for="(step, index) in form.steps" :key="'step-' + index" class="mb-4">
-          <label :for="'step-' + index" class="block text-sm font-medium text-gray-700 mb-1">Шаг {{ index + 1 }} *</label>
-          <div class="flex gap-2">
-            <textarea
-              :id="'step-' + index"
-              v-model="form.steps[index]"
-              rows="2"
-              required
-              class="flex-1 p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            ></textarea>
-            <button
-              type="button"
-              @click="removeStep(index)"
-              class="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors self-end"
-              :disabled="form.steps.length <= 1"
-              :class="{ 'opacity-50 cursor-not-allowed': form.steps.length <= 1 }"
-            >
-              Удалить
-            </button>
-          </div>
-        </div>
-      </div>
+      </template>
+      
 
       <!-- Кнопки формы -->
       <div class="flex justify-end space-x-4">
@@ -214,6 +64,102 @@ const { addRecipe } = useRecipes();
 
 const units: Unit[] = ['г', 'кг', 'мл', 'л', 'шт', 'ст.л.', 'ч.л.', 'по вкусу'];
 const isSubmitting = ref(false);
+
+const formFields = [
+  {
+    "title": "Основная информация",
+    "type": "main",
+    "items": [
+        {
+            "type": "text",
+            "name": "title",
+            "title": "Имя",
+            "required": true
+        },
+        {
+            "type": "number",
+            "name": "cookingTime",
+            "title": "Телефон",
+            "required": true
+        },
+        {
+            "type": "number",
+            "name": "servings",
+            "title": "Количество порций",
+            "required": true
+        },
+        {
+            "type": "select",
+            "name": "difficulty",
+            "title": "Сложность",
+            "options": [
+                {
+                    "value": "легко",
+                    "title": "Легкая"
+                },
+                {
+                    "value": "средне",
+                    "title": "Средняя"
+                },
+                {
+                    "value": "сложно",
+                    "title": "Сложная"
+                }
+            ],
+            "required": true
+        },
+        {
+            "type": "textarea",
+            "name": "description",
+            "title": "Описание",
+            "required": true
+        },
+        {
+            "type": "text",
+            "name": "imageUrl",
+            "title": "Ссылка на изображение",
+            "required": true
+        }
+    ]
+  },
+  {
+    "title": "Ингредиенты",
+    "type": "ingredients",
+    "items": [
+        {
+            "type": "text",
+            "name": "name",
+            "title": "Название",
+            "required": true
+        },
+        {
+            "type": "number",
+            "name": "quantity",
+            "title": "Количество",
+            "required": true
+        },
+        {
+            "type": "select",
+            "name": "unit",
+            "title": "Единица измерения",
+            "options": units,
+            "required": true
+        }
+    ]
+  },
+  {
+    "title": "Шаги приготовления",
+    "type": "steps",
+    "items": [
+        {
+            "type": "textarea",
+            "name": "name",
+            "title": "Шаг",
+            "required": true
+        }
+    ]
+  }
+]
 
 const form = ref<Omit<Recipe, 'id'>>({
   title: '',
