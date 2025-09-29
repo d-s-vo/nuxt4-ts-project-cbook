@@ -13,6 +13,9 @@ export default defineNuxtConfig({
       hmr: true
     }
   },
+  css: [
+		'@/assets/css/main.css'
+	],
   // Modules
   modules: [
     '@nuxtjs/tailwindcss'
