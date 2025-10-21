@@ -46,9 +46,121 @@
               </template>
             </div>
           </template>
+
+          <!-- Раздел ингредиентов -->
+          <template v-else-if="field?.type === 'ingredients'">
+            <div class="flex justify-between items-center mb-[20px]">
+              <h2 class="text-xl font-semibold">{{ field.title }}</h2>
+              <button
+                type="button"
+                @click="addIngredient"
+                class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors text-sm"
+              >
+                + Добавить ингредиент
+              </button>
+            </div>
+            
+            <div
+              v-for="(ingredient, index) in form.ingredients"
+              :key="index"
+              class="grid grid-cols-1 md:grid-cols-12 gap-4 relative  mt-[20px]"
+            >
+              <!-- Название ингредиента -->
+              <div class="md:col-span-5">
+                <div class="text-sm font-medium mb-2">Название ингредиента</div>
+                <form-input
+                  v-model="ingredient.name"
+                  type="text"
+                  placeholder="Введите название"
+                  class="w-full"
+                  required
+                />
+              </div>
+
+              <!-- Количество -->
+              <div class="md:col-span-3">
+                <div class="text-sm font-medium mb-2">Количество</div>
+                <form-input
+                  v-model="ingredient.quantity"
+                  type="number"
+                  placeholder="0"
+                  min="0"
+                  step="0.1"
+                  class="w-full"
+                  required
+                />
+              </div>
+
+              <!-- Единица измерения -->
+              <div class="md:col-span-3">
+                <div class="text-sm font-medium mb-2">Единица измерения</div>
+                <input-select
+                  v-model="ingredient.unit"
+                  :options="[
+                    { value: 'г', title: 'Граммы' },
+                    { value: 'кг', title: 'Килограммы' },
+                    { value: 'мл', title: 'Миллилитры' },
+                    { value: 'л', title: 'Литры' },
+                    { value: 'шт', title: 'Штуки' },
+                    { value: 'ст.л.', title: 'Столовые ложки' },
+                    { value: 'ч.л.', title: 'Чайные ложки' },
+                    { value: 'по вкусу', title: 'По вкусу' }
+                  ]"
+                  class="w-full"
+                />
+              </div>
+
+              <!-- Кнопка удаления -->
+              <icons-trash 
+                @click="removeIngredient(index)"
+                class="absolute top-0 right-0 cursor-pointer hover:text-green-600"
+                :class="{ 'opacity-50 pointer-events-none': form.ingredients.length <= 1 }"
+              />
+            </div>
+          </template>
+
+          <template v-else-if="field?.type === 'steps'">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-xl font-semibold">{{ field.title }}</h2>
+              <button
+                type="button"
+                @click="addStep"
+                class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors text-sm"
+              >
+                + Добавить шаг
+              </button>
+            </div>
+            
+            <div
+              v-for="(step, index) in form.steps"
+              :key="index"
+              class="relative mt-[20px]"
+            >
+              <div class="flex items-start gap-4">
+                <!-- Поле для шага -->
+                <div class="flex-grow">
+                  <div class="text-sm font-medium mb-2">Описание шага</div>
+                  <form-input
+                    v-model="form.steps[index]"
+                    type="textarea"
+                    placeholder="Опишите шаг приготовления..."
+                    class="w-full"
+                    rows="3"
+                    required
+                  />
+                </div>
+
+                <!-- Кнопка удаления -->
+                <icons-trash 
+                @click="removeStep(index)"
+                class="absolute top-0 right-0 cursor-pointer hover:text-green-600"
+                :class="{ 'opacity-50 pointer-events-none': form.ingredients.length <= 1 }"
+              />
+              </div>
+            </div>
+          </template>
         </div>
       </template>
-
       <!-- Кнопки формы -->
       <div class="flex justify-end space-x-4">
         <button
