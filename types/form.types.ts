@@ -31,16 +31,24 @@ export interface MainGroup {
   items: Field<MainKeys>[];
 }
 
+export interface IngredientFieldGroup {
+  items: [
+    Field<'name'>,
+    Field<'quantity'>,
+    Field<'unit'>
+  ];
+}
+
 export interface IngredientsGroup {
   title: string;
   type: 'ingredients';
-  items: Field<IngredientKeys>[];
+  ingredients: IngredientFieldGroup[]; 
 }
 
 export interface StepsGroup {
   title: string;
   type: 'steps';
-  items: Field<StepKeys>[];
+  items: Field<StepKeys>[]; 
 }
 
 // --- Общий тип ---

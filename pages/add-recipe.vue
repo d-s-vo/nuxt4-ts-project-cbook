@@ -61,61 +61,53 @@
             </div>
             
             <div
-              v-for="(ingredient, index) in form.ingredients"
-              :key="index"
-              class="grid grid-cols-1 md:grid-cols-12 gap-4 relative  mt-[20px]"
+              class="relative mt-[20px] flex flex-col gap-y-[20px]"
             >
-              <!-- Название ингредиента -->
-              <div class="md:col-span-5">
-                <div class="text-sm font-medium mb-2">Название ингредиента</div>
-                <form-input
-                  v-model="ingredient.name"
-                  type="text"
-                  placeholder="Введите название"
-                  class="w-full"
-                  required
-                />
-              </div>
+              <template
+                v-for="(ingredient, index) in form.ingredients"
+                :key="index"
+              >
+                <div>
+                  <!-- Кнопка удаления -->
+                    <icons-trash 
+                    @click="removeIngredient(index)"
+                    class="cursor-pointer hover:text-green-600 transition-all duration-300 ml-auto mb-[10px]"
+                    :class="{ 'hidden': form.ingredients.length <= 1 }"
+                  />
 
-              <!-- Количество -->
-              <div class="md:col-span-3">
-                <div class="text-sm font-medium mb-2">Количество</div>
-                <form-input
-                  v-model="ingredient.quantity"
-                  type="number"
-                  placeholder="0"
-                  min="0"
-                  step="0.1"
-                  class="w-full"
-                  required
-                />
-              </div>
+                  <div  class="grid grid-cols-1 md:grid-cols-12 gap-[15px]">
+                    <template
+                      v-if="field?.ingredients?.[0]?.items"
+                      v-for="item in field?.ingredients[0].items"
+                      :key="item.name"
+                    >
+                      <!-- Название ингредиента -->
+                      <form-input
+                        v-if="item.name === 'name'"
+                        v-model="ingredient.name"
+                        :type="item.type"
+                        class="w-full col-span-5"
+                      />
 
-              <!-- Единица измерения -->
-              <div class="md:col-span-3">
-                <div class="text-sm font-medium mb-2">Единица измерения</div>
-                <input-select
-                  v-model="ingredient.unit"
-                  :options="[
-                    { value: 'г', title: 'Граммы' },
-                    { value: 'кг', title: 'Килограммы' },
-                    { value: 'мл', title: 'Миллилитры' },
-                    { value: 'л', title: 'Литры' },
-                    { value: 'шт', title: 'Штуки' },
-                    { value: 'ст.л.', title: 'Столовые ложки' },
-                    { value: 'ч.л.', title: 'Чайные ложки' },
-                    { value: 'по вкусу', title: 'По вкусу' }
-                  ]"
-                  class="w-full"
-                />
-              </div>
+                      <!-- Количество -->
+                      <form-input
+                        v-if="item.name === 'quantity'"
+                        v-model="ingredient.quantity"
+                        :type="item.type"
+                        class="w-full col-span-3"
+                      />
 
-              <!-- Кнопка удаления -->
-              <icons-trash 
-                @click="removeIngredient(index)"
-                class="absolute top-0 right-0 cursor-pointer hover:text-green-600"
-                :class="{ 'opacity-50 pointer-events-none': form.ingredients.length <= 1 }"
-              />
+                      <!-- Единица измерения -->
+                      <input-select
+                        v-if="item.name === 'unit'"
+                        v-model="ingredient.unit"
+                        :options="(item as SelectField).options"
+                        class="w-full col-span-4"
+                      />
+                    </template>
+                  </div>
+                </div>
+              </template>
             </div>
           </template>
 
@@ -161,6 +153,7 @@
           </template>
         </div>
       </template>
+
       <!-- Кнопки формы -->
       <div class="flex justify-end space-x-4">
         <button
@@ -255,35 +248,39 @@ const formFields: FormGroup[] = [
   {
     "title": "Ингредиенты",
     "type": "ingredients",
-    "items": [
-        {
-          "type": "text",
-          "name": "name",
-          "title": "Название",
-          "required": true
-        },
-        {
-          "type": "number",
-          "name": "quantity",
-          "title": "Количество",
-          "required": true
-        },
-        {
-          "type": "select",
-          "name": "unit",
-          "title": "Единица измерения",
-          "options": [
-            { value: 'г', title: 'Граммы' },
-            { value: 'кг', title: 'Килограммы' },
-            { value: 'мл', title: 'Миллилитры' },
-            { value: 'л', title: 'Литры' },
-            { value: 'шт', title: 'Штуки' },
-            { value: 'ст.л.', title: 'Столовые ложки' },
-            { value: 'ч.л.', title: 'Чайные ложки' },
-            { value: 'по вкусу', title: 'По вкусу' }
-          ],
-          "required": true
-        }
+    "ingredients": [
+      {
+        "items": [
+          {
+            "type": "text",
+            "name": "name",
+            "title": "Название",
+            "required": true
+          },
+          {
+            "type": "number",
+            "name": "quantity",
+            "title": "Количество",
+            "required": true
+          },
+          {
+            "type": "select",
+            "name": "unit",
+            "title": "Единица измерения",
+            "options": [
+              { value: 'г', title: 'Граммы' },
+              { value: 'кг', title: 'Килограммы' },
+              { value: 'мл', title: 'Миллилитры' },
+              { value: 'л', title: 'Литры' },
+              { value: 'шт', title: 'Штуки' },
+              { value: 'ст.л.', title: 'Столовые ложки' },
+              { value: 'ч.л.', title: 'Чайные ложки' },
+              { value: 'по вкусу', title: 'По вкусу' }
+            ],
+            "required": true
+          }
+        ]
+      }
     ]
   },
   {
@@ -370,23 +367,3 @@ const submitForm = async () => {
   }
 };
 </script>
-
-<style scoped>
-/* Стили для улучшенного UX */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-/* Анимация появления/скрытия элементов */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>
