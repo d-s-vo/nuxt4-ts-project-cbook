@@ -15,6 +15,7 @@ interface BaseField<TName extends string = string> {
   name: TName;
   title: string;
   required?: boolean;
+  placeholder?: string;
 }
 
 export interface SelectField<TName extends string = string> extends BaseField<TName> {

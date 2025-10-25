@@ -4,12 +4,14 @@
         :type="type"
         v-model="modelValue"
         class="form-input"
+        :placeholder="placeholder"
     />
     <textarea
       v-else
       rows="3"
       v-model="modelValue"
       class="form-input"
+      :placeholder="placeholder"
     />
 </template>
 <script setup lang="ts">
@@ -17,6 +19,7 @@
     
     const props = defineProps<{
         type: 'text' | 'number' | 'textarea';
+        placeholder?: string;
     }>();
 
     const modelValue = defineModel<string | number>();

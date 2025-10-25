@@ -1,5 +1,16 @@
 <template>
   <div class="max-w-3xl mx-auto p-6">
+    <a 
+          href="/" 
+          class="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6 no-underline"
+          @click.prevent="$router.back()"
+      >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+          </svg>
+          Назад к рецептам
+      </a>
+
     <h1 class="text-3xl font-bold mb-8 text-center">Добавить новый рецепт</h1>
     
     <form @submit.prevent="submitForm" class="space-y-6">
@@ -33,6 +44,7 @@
                   v-if="['text', 'textarea', 'number'].includes(item.type)"
                   v-model="form[item.name]"
                   :type="item.type"
+                  :placeholder="item.placeholder"
                   class="w-full"
                 />
 
@@ -40,6 +52,7 @@
                   v-if="item.type === 'select'"
                   v-model="form[item.name]"
                   :options="(item as SelectField<typeof item.name>).options"
+                  :placeholder="item.placeholder"
                   class="w-full"
                 />
               </div>
@@ -82,19 +95,30 @@
                       :key="item.name"
                     >
                       <!-- Название ингредиента -->
-                      <form-input
-                        v-if="item.name === 'name'"
-                        v-model="ingredient.name"
-                        :type="item.type"
-                        class="w-full col-span-5"
-                      />
+                      <div
+                        :class="{
+                          'col-span-5': item.name === 'name',
+                          'col-span-3': item.name === 'quantity',
+                          'col-span-4': item.name === 'unit',
+                        }"
+                      >
+                        <div class="text-sm font-medium mb-2">{{ item.title }}</div>
+                        <form-input
+                          v-if="item.name === 'name'"
+                          v-model="ingredient.name"
+                          :type="item.type"
+                          :placeholder="item.placeholder"
+                          class="w-full"
+                        />
+                      
 
                       <!-- Количество -->
                       <form-input
                         v-if="item.name === 'quantity'"
                         v-model="ingredient.quantity"
                         :type="item.type"
-                        class="w-full col-span-3"
+                        :placeholder="item.placeholder"
+                        class="w-full"
                       />
 
                       <!-- Единица измерения -->
@@ -102,8 +126,9 @@
                         v-if="item.name === 'unit'"
                         v-model="ingredient.unit"
                         :options="(item as SelectField).options"
-                        class="w-full col-span-4"
+                        class="w-full"
                       />
+                    </div>
                     </template>
                   </div>
                 </div>
@@ -119,7 +144,7 @@
                 @click="addStep"
                 class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors text-sm"
               >
-                + Добавить шаг
+                + Добавить этап
               </button>
             </div>
             
@@ -128,27 +153,32 @@
               :key="index"
               class="relative mt-[20px]"
             >
-              <div class="flex items-start gap-4">
-                <!-- Поле для шага -->
-                <div class="flex-grow">
-                  <div class="text-sm font-medium mb-2">Описание шага</div>
-                  <form-input
-                    v-model="form.steps[index]"
-                    type="textarea"
-                    placeholder="Опишите шаг приготовления..."
-                    class="w-full"
-                    rows="3"
-                    required
+              <template
+                v-if="field?.items?.length"
+                v-for="(item, i) in field.items"
+                :key="`${i}-${item.name}`"
+              >
+                <div class="flex items-start gap-4">
+                  <!-- Поле для шага -->
+                  <div class="flex-grow">
+                    <div class="text-sm font-medium mb-2">Описание этапа</div>
+                    <form-input
+                      v-model="form.steps[index]"
+                      :type="item.type"
+                      :placeholder="item.placeholder"
+                      class="w-full"
+                      required
+                    />
+                  </div>
+
+                    <!-- Кнопка удаления -->
+                  <icons-trash 
+                    @click="removeStep(index)"
+                    class="absolute top-0 right-0 cursor-pointer hover:text-green-600"
+                    :class="{ 'hidden': form.steps.length <= 1 }"
                   />
                 </div>
-
-                <!-- Кнопка удаления -->
-                <icons-trash 
-                @click="removeStep(index)"
-                class="absolute top-0 right-0 cursor-pointer hover:text-green-600"
-                :class="{ 'opacity-50 pointer-events-none': form.ingredients.length <= 1 }"
-              />
-              </div>
+              </template>
             </div>
           </template>
         </div>
@@ -196,20 +226,23 @@ const formFields: FormGroup[] = [
         {
             "type": "text",
             "name": "title",
-            "title": "Имя",
-            "required": true
+            "title": "Название блюда",
+            "required": true,
+            "placeholder": "Название блюда"
         },
         {
             "type": "number",
             "name": "cookingTime",
-            "title": "Телефон",
-            "required": true
+            "title": "Время приготовления",
+            "required": true,
+            "placeholder": "Время приготовления"  
         },
         {
             "type": "number",
             "name": "servings",
             "title": "Количество порций",
-            "required": true
+            "required": true,
+            "placeholder": "Количество порций"
         },
         {
             "type": "select",
@@ -229,19 +262,22 @@ const formFields: FormGroup[] = [
                     "title": "Сложная"
                 }
             ],
-            "required": true
+            "required": true,
+            "placeholder": "Сложность"
         },
         {
             "type": "textarea",
             "name": "description",
-            "title": "Описание",
-            "required": true
+            "title": "Описание блюда",
+            "required": true,
+            "placeholder": "Добавьте описание"
         },
         {
             "type": "text",
             "name": "imageUrl",
             "title": "Ссылка на изображение",
-            "required": true
+            "required": true,
+            "placeholder": "Вставьте ссылку на изображение"
         }
     ]
   },
@@ -255,13 +291,15 @@ const formFields: FormGroup[] = [
             "type": "text",
             "name": "name",
             "title": "Название",
-            "required": true
+            "required": true,
+            "placeholder": "Введите название ингредиента"
           },
           {
             "type": "number",
             "name": "quantity",
             "title": "Количество",
-            "required": true
+            "required": true,
+            "placeholder": "5"
           },
           {
             "type": "select",
@@ -284,14 +322,15 @@ const formFields: FormGroup[] = [
     ]
   },
   {
-    "title": "Шаги приготовления",
+    "title": "Этапы приготовления",
     "type": "steps",
     "items": [
         {
           "type": "textarea",
           "name": "step",
-          "title": "Шаг",
-          "required": true
+          "title": "Этап",
+          "required": true,
+          "placeholder": "Опишите этап приготовления"
         }
     ]
   }
