@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-slate-50 font-sans">
+  <div class="min-h-screen bg-white font-sans">
     <main class="max-w-7xl mx-auto py-6">
       <NuxtPage />
     </main>

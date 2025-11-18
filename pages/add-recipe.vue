@@ -80,7 +80,7 @@
               class="grid grid-cols-12 gap-4 mb-4 items-end"
             >
               <template 
-                v-for="field in group.ingredients[0].items" 
+                v-for="field in group.ingredients[0]?.items" 
                 :key="field.name"
               >
                 <UFormField
@@ -108,6 +108,7 @@
                     :label="field.title"
                     :required="field.required"
                     :placeholder="field.placeholder"
+                    :type="field.type"
                     class="w-full"
                   />
                 </UFormField>
