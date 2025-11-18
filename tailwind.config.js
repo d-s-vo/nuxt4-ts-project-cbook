@@ -7,7 +7,8 @@ export default {
     "./plugins/**/*.{js,ts}",
     "./app/**/*.{js,vue,ts}",
     "./nuxt.config.{js,ts}",
-    "./app.vue"
+    "./app.vue",
+    './node_modules/@nuxt/ui/dist/**/*.{js,ts,vue}'
   ],
   theme: {
     extend: {

@@ -20,7 +20,7 @@ interface BaseField<TName extends string = string> {
 
 export interface SelectField<TName extends string = string> extends BaseField<TName> {
   type: 'select';
-  options: { value: string; title: string }[];
+  options: { value: string; label: string }[];
 }
 
 export type Field<TName extends string = string> = BaseField<TName> | SelectField<TName>;

@@ -13,14 +13,8 @@ export default defineNuxtConfig({
       hmr: true
     }
   },
-  css: [
-		'@/assets/css/main.css'
-	],
-  // Modules
-  modules: [
-    '@nuxtjs/tailwindcss'
-  ],
-  // Ensure pages directory is properly configured
+  css: ['./assets/css/main.css'],
+  modules: ['@nuxt/ui'],
   srcDir: '.',
   app: {
     pageTransition: { name: 'page', mode: 'out-in' }
