@@ -59,7 +59,7 @@
                   class="w-full"
                 />
                 <USelect
-                  v-else-if="'options' in item"
+                  v-else-if="item.type === 'select' && 'options' in item"
                   v-model="form[item.name]"
                   :items="item.options"
                   :name="item.name"
@@ -101,7 +101,7 @@
                     class="w-full"
                   />
                   <USelect
-                    v-else
+                    v-else-if="field.type === 'select' && 'options' in field"
                     v-model="ingredient[field.name]"
                     :items="field.options"
                     :name="`ingredient-${ingIndex}-${field.name}`"
