@@ -51,7 +51,8 @@
           >
             <template v-for="item in group.items" :key="item.name">
               <UFormField 
-                :label="item.title" 
+                :label="item.title"
+                :error="fieldErrors[item.name]"
                 class="col-span-6"
               >
                 <UInput
@@ -80,56 +81,63 @@
 
           <!-- Ingredients section -->
           <div v-if="group.type === 'ingredients'">
-            <div 
+            <template 
               v-for="(ingredient, ingIndex) in form.ingredients" 
               :key="ingIndex" 
-              class="grid grid-cols-12 gap-4 mb-4 items-end"
             >
-              <template 
-                v-for="field in group.ingredients[0]?.items" 
-                :key="field.name"
+              <UForm
+                nested
+                :state="ingredient"
+                :name="`ingredient-${ingIndex}`"
+                class="grid grid-cols-12 gap-4 mb-4"
               >
-                <UFormField
-                  :class="{
-                    'col-span-5': field.name === 'name',
-                    'col-span-4': field.name === 'quantity',
-                    'col-span-2': field.name === 'unit'
-                  }"
+                <template 
+                  v-for="field in group.ingredients[0]?.items" 
+                  :key="field.name"
                 >
-                  <UInput
-                    v-if="field.type !== 'select'"
-                    v-model="ingredient[field.name]"
-                    :name="`ingredient-${ingIndex}-${field.name}`"
-                    :label="field.title"
-                    :type="field.type"
-                    :required="field.required"
-                    :placeholder="field.placeholder"
-                    class="w-full"
-                  />
-                  <USelect
-                    v-else-if="field.type === 'select' && 'options' in field"
-                    v-model="ingredient[field.name]"
-                    :items="field.options"
-                    :name="`ingredient-${ingIndex}-${field.name}`"
-                    :label="field.title"
-                    :required="field.required"
-                    :placeholder="field.placeholder"
-                    :type="field.type"
-                    class="w-full"
-                  />
-                </UFormField>
-              </template>
-              
-              <UButton
-                v-if="form.ingredients.length > 1"
-                @click="removeIngredient(ingIndex)"
-                color="red"
-                variant="ghost"
-                icon="i-heroicons-trash"
-                size="sm"
-                class="col-span-1"
-              />
-            </div>
+                  <UFormField
+                    :class="{
+                      'col-span-5': field.name === 'name',
+                      'col-span-4': field.name === 'quantity',
+                      'col-span-2': field.name === 'unit'
+                    }"
+                    :error="fieldErrors[`ingredients.${ingIndex}.${field.name}`]"
+                  >
+                    <UInput
+                      v-if="field.type !== 'select'"
+                      v-model="ingredient[field.name]"
+                      :name="`ingredient-${ingIndex}-${field.name}`"
+                      :label="field.title"
+                      :type="field.type"
+                      :required="field.required"
+                      :placeholder="field.placeholder"
+                      class="w-full"
+                    />
+                    <USelect
+                      v-else-if="field.type === 'select' && 'options' in field"
+                      v-model="ingredient[field.name]"
+                      :items="field.options"
+                      :name="`ingredient-${ingIndex}-${field.name}`"
+                      :label="field.title"
+                      :required="field.required"
+                      :placeholder="field.placeholder"
+                      :type="field.type"
+                      class="w-full"
+                    />
+                  </UFormField>
+                </template>
+
+                <UButton
+                  v-if="form.ingredients.length > 1"
+                  @click="removeIngredient(ingIndex)"
+                  color="red"
+                  variant="ghost"
+                  icon="i-heroicons-trash"
+                  size="sm"
+                  class="col-span-1"
+                />
+              </UForm>
+            </template>
           </div>
 
           <!-- Steps section -->
@@ -139,7 +147,10 @@
               :key="index" 
               class="flex items-start gap-2"
             >
-              <UFormField class="flex-1">
+              <UFormField 
+                :error="fieldErrors[`steps.${index}`]"
+                class="flex-1"
+              >
                 <UInput
                   v-model="form.steps[index]"
                   :name="`step-${index}`"
@@ -199,6 +210,7 @@ const { addRecipe } = useRecipes();
 
 const units: Unit[] = ['г', 'кг', 'мл', 'л', 'шт', 'ст.л.', 'ч.л.', 'по вкусу'] as const;
 const isSubmitting = ref(false);
+const fieldErrors = ref<Record<string, string>>({});
 
 const schema = z.object({
   title: z.string().min(1, 'Название блюда обязательно'),
@@ -281,7 +293,12 @@ const submitForm = async () => {
     // Проверяем валидность формы
     const result = schema.safeParse(form.value);
     if (!result.success) {
-      console.log(result.error)
+      // console.log(result.error);
+
+      result.error.issues.forEach((err) => {
+        const key = err.path.join('.');
+        fieldErrors.value[key] = err.message;
+      });
       return;
     }    
 
