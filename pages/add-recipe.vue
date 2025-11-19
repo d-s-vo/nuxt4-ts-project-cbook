@@ -16,6 +16,9 @@
   <UForm
     class="flex flex-col gap-[20px]"
     :key="formKey"
+    :schema="schema"
+    :state="form"
+    :submit="submitForm"
   >
     <template v-for="group in mockFormField">
       <div
@@ -189,12 +192,34 @@ import { useRouter } from 'vue-router';
 import type { Recipe, Ingredient, Unit, FormGroup, SelectField } from '~/types';
 import { useRecipes } from '~/composables/useRecipes';
 import { mockFormField } from '~/data/mockFormField';
+import * as z from 'zod';
 
 const router = useRouter();
 const { addRecipe } = useRecipes();
 
 const units: Unit[] = ['г', 'кг', 'мл', 'л', 'шт', 'ст.л.', 'ч.л.', 'по вкусу'] as const;
 const isSubmitting = ref(false);
+
+const schema = z.object({
+  title: z.string().min(1, 'Название блюда обязательно'),
+  description: z.string().min(1, 'Описание блюда обязательно'),
+  cookingTime: z.number().min(1, 'Время приготовления обязательно'),
+  servings: z.number().min(1, 'Количество порций обязательно'),
+  difficulty: z.enum(['легко', 'средне', 'сложно'], { message: 'Сложность обязательно'}),
+  ingredients: z.array(z.object({
+    name: z.string().min(1, 'Название ингредиента обязательно'),
+    quantity: z.number().min(1, 'Количество обязательно'),
+    unit: z.enum(units, { message: 'Единица измерения обязательно'})
+  })),
+  steps: z.array(z.string().min(1, 'Шаг обязательно')),
+  // z.union для валидации url или null
+  imageUrl: z.union(
+      [
+        z.string().url('Неверная ссылка на изображение'), 
+        z.null()
+      ]
+  ).optional()
+});
 
 const form = ref<Omit<Recipe, 'id'>>({
   title: '',
@@ -206,7 +231,7 @@ const form = ref<Omit<Recipe, 'id'>>({
     { name: '', quantity: 0, unit: 'г' as const }
   ],
   steps: [''],
-  imageUrl: ''
+  imageUrl: null
 });
 
 const addIngredient = () => {
@@ -252,6 +277,13 @@ const resetForm = () => {
 const submitForm = async () => {
   try {
     isSubmitting.value = true;
+
+    // Проверяем валидность формы
+    const result = schema.safeParse(form.value);
+    if (!result.success) {
+      console.log(result.error)
+      return;
+    }    
 
     // Добавляем рецепт через композабл
     addRecipe(form.value);
