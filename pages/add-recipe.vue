@@ -47,7 +47,10 @@
             class="grid grid-cols-12 gap-4"
           >
             <template v-for="item in group.items" :key="item.name">
-              <UFormField :label="item.title" class="col-span-6">
+              <UFormField 
+                :label="item.title" 
+                class="col-span-6"
+              >
                 <UInput
                   v-if="item.type !== 'select'"
                   v-model="form[item.name]"
@@ -190,7 +193,7 @@ import { mockFormField } from '~/data/mockFormField';
 const router = useRouter();
 const { addRecipe } = useRecipes();
 
-const units: Unit[] = ['г', 'кг', 'мл', 'л', 'шт', 'ст.л.', 'ч.л.', 'по вкусу'];
+const units: Unit[] = ['г', 'кг', 'мл', 'л', 'шт', 'ст.л.', 'ч.л.', 'по вкусу'] as const;
 const isSubmitting = ref(false);
 
 const form = ref<Omit<Recipe, 'id'>>({
