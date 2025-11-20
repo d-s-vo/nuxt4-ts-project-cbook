@@ -89,7 +89,7 @@
                 nested
                 :state="ingredient"
                 :name="`ingredient-${ingIndex}`"
-                class="grid grid-cols-12 gap-4 mb-4"
+                class="grid grid-cols-12 gap-4 mb-4 items-start"
               >
                 <template 
                   v-for="field in group.ingredients[0]?.items" 
