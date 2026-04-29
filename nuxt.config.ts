@@ -11,6 +11,14 @@ export default defineNuxtConfig({
   vite: {
     server: {
       hmr: true
+    },
+    optimizeDeps: {
+      include: [
+        '@vue/devtools-core',
+        '@vue/devtools-kit',
+        '@vueuse/core',
+        'zod'
+      ]
     }
   },
   css: ['./assets/css/main.css'],
