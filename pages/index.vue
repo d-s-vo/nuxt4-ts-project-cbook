@@ -1,7 +1,7 @@
 <template>
     <div class="max-w-[800px] mx-auto">
         <div
-            class="flex items-center justify-between gap-[20px] bg-[#f0f0f0] p-[20px]"
+            class="flex items-center justify-between gap-[20px] bg-[#f0f0f0] dark:bg-[#333] p-[20px]"
         >
             <h1 class="text-[36px] font-bold underline font-dancing leading-[1.3]">
                 Recipes:
@@ -11,7 +11,7 @@
                 type="text"
                 v-model="searchQuery"
                 placeholder="Search recipes..."
-                class="p-[10px] border-[1px] border-[#e0e0e0] rounded-[10px]"
+                class="p-[10px] border-[1px] border-[#e0e0e0] rounded-[10px] dark:border-[#555] dark:bg-[#222]"
             />
         </div>
 
@@ -29,7 +29,11 @@
                 />
             </template>
 
-            <a href="/add-recipe" class="text-[#007bff] hover:underline">Add new recipe</a>
+            <div class="flex items-center justify-between">
+                <a href="/add-recipe" class="text-[#007bff] hover:underline">Add new recipe</a>
+
+                <button @click="toggleTheme" class="text-[#007bff] hover:underline">Toggle theme</button>
+            </div>
         </div>
     </div>
 </template>
@@ -37,6 +41,7 @@
 import { useRecipes } from "~/composables/useRecipes";
 import { ref, computed } from "vue";
 import type { Recipe } from '~/types';
+import { useColorMode } from "@vueuse/core";
 
 const {recipes} = useRecipes();
 
@@ -57,4 +62,10 @@ const filteredRecipes = computed<Recipe[]>(() => {
     return getRecipesByTitle(query);
 });
 
+const colorMode = useColorMode();
+
+// Изменение темы
+const toggleTheme = () => {
+  colorMode.value = colorMode.value === 'dark' ? 'light' : 'dark'
+}
 </script>

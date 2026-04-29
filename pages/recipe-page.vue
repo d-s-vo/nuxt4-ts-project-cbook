@@ -11,7 +11,7 @@
             Назад к рецептам
         </a>
 
-        <div v-if="recipe" class="bg-white rounded-lg border overflow-hidden">
+        <div v-if="recipe" class="bg-white dark:bg-[#333] rounded-lg border overflow-hidden">
             <img 
                 v-if="recipe.imageUrl" 
                 :src="recipe.imageUrl" 
