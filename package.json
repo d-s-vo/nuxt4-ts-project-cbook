@@ -25,7 +25,8 @@
   "devDependencies": {
     "@nuxtjs/router": "^1.7.0",
     "@types/node": "^24.5.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vue-tsc": "^3.2.8"
   },
   "keywords": [
     "vue",
