@@ -1,6 +1,33 @@
-import type { Recipe } from "../types/index.d.ts";
+// server/api/recipes.get.ts
+import { defineEventHandler } from 'h3'
+import type { Recipe } from '~/shared/types/recipe.types'
 
-export const mockRecipes: Recipe[] = [
+// Явно указываем, что эндпоинт возвращает массив Recipe[]
+export default defineEventHandler((event): Recipe[] => {
+  return [
+    {
+      id: 1,
+      title: 'Сырники с ванилью',
+      description: 'Нежные и воздушные сырники на идеальный завтрак.',
+      cookingTime: 25,
+      servings: 2,
+      difficulty: 'легко',
+      ingredients: [
+        { name: 'Творог 9%', quantity: 400, unit: 'г' },
+        { name: 'Яйцо куриное', quantity: 1, unit: 'шт' },
+        { name: 'Мука пшеничная', quantity: 2, unit: 'ст.л.' },
+        { name: 'Сахар', quantity: 1, unit: 'ст.л.' },
+        { name: 'Ванилин', quantity: 1, unit: 'по вкусу' }
+      ],
+      steps: [
+        'Тщательно размять творог вилкой, чтобы не было крупных комочков.',
+        'Добавить яйцо, сахар и ванилин, перемешать до однородности.',
+        'Всыпать муку и замесить мягкое творожное тесто.',
+        'Сформировать небольшие шайбочки, обвалять в муке.',
+        'Обжарить на разогретой сковороде с каплей масла по 3-4 минуты с каждой стороны до золотистой корочки.'
+      ],
+      imageUrl: '/images/placeholder.jpg' // Локальная картинка из папки public для старта
+    },
     {
         id: 1,
         title: "Шарлотка",
@@ -138,12 +165,5 @@ export const mockRecipes: Recipe[] = [
         ],
         imageUrl: "/images/pancakes.jpg"
     }
-]
-
-export const getRecipeById = (id: number): Recipe | undefined => {
-    return mockRecipes.find(recipe => recipe.id === id)
-};
-
-export const getAllRecipes = (): Recipe[] => {
-    return [...mockRecipes];
-};
+  ]
+})

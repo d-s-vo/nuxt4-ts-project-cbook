@@ -1,7 +1,6 @@
 import { computed, onMounted, watch, onUnmounted, ref } from 'vue';
 import { useState } from 'nuxt/app';
-import type { Recipe } from '../types';
-import { mockRecipes } from '../data/mockRecipes';
+import type { Recipe } from '../shared/types';
 
 const STORAGE_KEY = 'recipe-app-recipes';
 
@@ -19,13 +18,13 @@ export const useRecipes = () => {
         if (process.client) {
             try {
                 const saved = localStorage.getItem(STORAGE_KEY);
-                recipes.value = saved ? JSON.parse(saved) : [...mockRecipes];
+                recipes.value = saved ? JSON.parse(saved) : [];
             } catch (e) {
                 console.error('Failed to load recipes:', e);
-                recipes.value = [...mockRecipes];
+                recipes.value = [];
             }
         } else {
-            recipes.value = [...mockRecipes];
+            recipes.value = [];
         }
         
         isInitialized.value = true;

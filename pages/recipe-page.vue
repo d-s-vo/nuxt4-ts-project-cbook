@@ -85,7 +85,7 @@
 
 <script setup lang="ts">
 import { useRecipes } from '~/composables/useRecipes';
-import type { Recipe } from '~/types';
+import type { Recipe } from '~/shared/types';
 import { ref, onMounted, watch, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 

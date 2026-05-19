@@ -1,4 +1,4 @@
-import type { FormGroup } from "../types";
+import type { FormGroup } from "../shared/types";
 
 export const mockFormField: FormGroup[] = [
     {

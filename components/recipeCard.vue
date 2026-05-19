@@ -27,7 +27,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import type { Recipe } from '~/types';
+import type { Recipe } from '~/shared/types';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();

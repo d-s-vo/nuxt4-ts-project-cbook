@@ -57,7 +57,8 @@
               >
                 <UInput
                   v-if="item.type !== 'select'"
-                  v-model="form[item.name]"
+                  :model-value="getFormVal(item.name)"
+                  @update:model-value="(val) => setFormVal(item.name, val as string | number)"
                   :name="item.name"
                   :label="item.title"
                   :type="item.type"
@@ -67,7 +68,8 @@
                 />
                 <USelect
                   v-else-if="item.type === 'select' && 'options' in item"
-                  v-model="form[item.name]"
+                  :model-value="String(getFormVal(item.name) ?? '')"
+                  @update:model-value="(val) => setFormVal(item.name, val as string)"
                   :items="item.options"
                   :name="item.name"
                   :label="item.title"
@@ -85,9 +87,9 @@
               v-for="(ingredient, ingIndex) in form.ingredients" 
               :key="ingIndex" 
             >
+              <!-- Убрали :state="ingredient", так как nested формы используют state родителя -->
               <UForm
                 nested
-                :state="ingredient"
                 :name="`ingredient-${ingIndex}`"
                 class="grid grid-cols-12 gap-4 mb-4 items-start"
               >
@@ -105,7 +107,8 @@
                   >
                     <UInput
                       v-if="field.type !== 'select'"
-                      v-model="ingredient[field.name]"
+                      :model-value="getIngVal(ingredient, field.name)"
+                      @update:model-value="(val) => setIngVal(ingredient, field.name, val as string | number)"
                       :name="`ingredient-${ingIndex}-${field.name}`"
                       :label="field.title"
                       :type="field.type"
@@ -115,7 +118,8 @@
                     />
                     <USelect
                       v-else-if="field.type === 'select' && 'options' in field"
-                      v-model="ingredient[field.name]"
+                      :model-value="String(getIngVal(ingredient, field.name) ?? '')"
+                      @update:model-value="(val) => setIngVal(ingredient, field.name, val as string)"
                       :items="field.options"
                       :name="`ingredient-${ingIndex}-${field.name}`"
                       :label="field.title"
@@ -130,7 +134,7 @@
                 <UButton
                   v-if="form.ingredients.length > 1"
                   @click="removeIngredient(ingIndex)"
-                  color="red"
+                  color="error"
                   variant="ghost"
                   icon="i-heroicons-trash"
                   size="sm"
@@ -164,7 +168,7 @@
               <UButton
                 v-if="form.steps.length > 1"
                 @click="removeStep(index)"
-                color="red"
+                color="error"
                 variant="ghost"
                 icon="i-heroicons-trash"
                 size="sm"
@@ -180,7 +184,7 @@
     >
       <UButton
         @click="resetForm"
-        color="red"
+        color="error"
         label="Сбросить"
         class="bg-red-300 text-white hover:bg-red-500 hover:cursor-pointer"
       />
@@ -200,7 +204,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import type { Recipe, Ingredient, Unit, FormGroup, SelectField } from '~/types';
+import type { Recipe, Ingredient, Unit, FormGroup, SelectField } from '~/shared/types';
 import { useRecipes } from '~/composables/useRecipes';
 import { mockFormField } from '~/data/mockFormField';
 import * as z from 'zod';
@@ -224,7 +228,6 @@ const schema = z.object({
     unit: z.enum(units, { message: 'Единица измерения обязательно'})
   })),
   steps: z.array(z.string().min(1, 'Шаг обязательно')),
-  // z.union для валидации url или null
   imageUrl: z.union(
       [
         z.string().url('Неверная ссылка на изображение'), 
@@ -245,6 +248,28 @@ const form = ref<Omit<Recipe, 'id'>>({
   steps: [''],
   imageUrl: null
 });
+
+// --- СТРОГИЕ ХЕЛПЕРЫ ДЛЯ ДИНАМИЧЕСКОГО БАЙНДИНГА (БЕЗ ANY) ---
+const getFormVal = (key: string): string | number | undefined => {
+  // Двойной каст: form.value -> unknown -> Record
+  const val = (form.value as unknown as Record<string, unknown>)[key];
+  return (typeof val === 'string' || typeof val === 'number') ? val : undefined;
+};
+
+const setFormVal = (key: string, val: string | number) => {
+  (form.value as unknown as Record<string, unknown>)[key] = val;
+};
+
+const getIngVal = (ingredient: Ingredient, key: string): string | number | undefined => {
+  // Двойной каст: ingredient -> unknown -> Record
+  const val = (ingredient as unknown as Record<string, unknown>)[key];
+  return (typeof val === 'string' || typeof val === 'number') ? val : undefined;
+};
+
+const setIngVal = (ingredient: Ingredient, key: string, val: string | number) => {
+  (ingredient as unknown as Record<string, unknown>)[key] = val;
+};
+// -------------------------------------------------------------
 
 const addIngredient = () => {
   form.value.ingredients.push({ name: '', quantity: 0, unit: 'г' });
@@ -280,8 +305,9 @@ const resetForm = () => {
         { name: '', quantity: 0, unit: 'г' as const }
       ],
       steps: [''],
-      imageUrl: ''
+      imageUrl: null
     };
+    fieldErrors.value = {};
     formKey.value++;
   }
 };
@@ -289,12 +315,10 @@ const resetForm = () => {
 const submitForm = async () => {
   try {
     isSubmitting.value = true;
+    fieldErrors.value = {};
 
-    // Проверяем валидность формы
     const result = schema.safeParse(form.value);
     if (!result.success) {
-      // console.log(result.error);
-
       result.error.issues.forEach((err) => {
         const key = err.path.join('.');
         fieldErrors.value[key] = err.message;
@@ -302,13 +326,8 @@ const submitForm = async () => {
       return;
     }    
 
-    // Добавляем рецепт через композабл
     addRecipe(form.value);
-    
-    // Перенаправляем на главную страницу
     await router.push('/');
-    
-    // Показываем уведомление об успешном добавлении
     alert('Рецепт успешно добавлен!');
   } catch (error) {
     console.error('Ошибка при сохранении рецепта:', error);
