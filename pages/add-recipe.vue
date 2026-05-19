@@ -205,12 +205,10 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import type { Recipe, Ingredient, Unit, FormGroup, SelectField } from '~/shared/types';
-import { useRecipes } from '~/composables/useRecipes';
 import { mockFormField } from '~/data/mockFormField';
 import * as z from 'zod';
 
 const router = useRouter();
-const { addRecipe } = useRecipes();
 
 const units: Unit[] = ['г', 'кг', 'мл', 'л', 'шт', 'ст.л.', 'ч.л.', 'по вкусу'] as const;
 const isSubmitting = ref(false);
@@ -317,6 +315,7 @@ const submitForm = async () => {
     isSubmitting.value = true;
     fieldErrors.value = {};
 
+    // 1. Валидация формы
     const result = schema.safeParse(form.value);
     if (!result.success) {
       result.error.issues.forEach((err) => {
@@ -326,9 +325,16 @@ const submitForm = async () => {
       return;
     }    
 
-    addRecipe(form.value);
+    // 2. ОТПРАВКА ДАННЫХ НА СЕРВЕР (Новая логика)
+    await $fetch('/api/recipes', {
+      method: 'POST',
+      body: form.value
+    });
+    
+    // 3. Редирект и уведомление
     await router.push('/');
     alert('Рецепт успешно добавлен!');
+    
   } catch (error) {
     console.error('Ошибка при сохранении рецепта:', error);
     alert('Произошла ошибка при сохранении рецепта. Пожалуйста, попробуйте снова.');

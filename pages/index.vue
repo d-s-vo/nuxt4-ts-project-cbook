@@ -42,9 +42,6 @@ import { ref, computed } from "vue";
 import type { Recipe } from '~/shared/types/recipe.types';
 import { useColorMode } from "@vueuse/core";
 
-// Явный импорт для Nuxt 4
-import { useFetch } from '#imports'
-
 const { data: recipes, pending } = await useFetch<Recipe[]>('/api/recipes');
 
 const searchQuery = ref('');
