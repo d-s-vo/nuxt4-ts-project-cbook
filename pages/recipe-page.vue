@@ -62,7 +62,7 @@
             </div>
 
             <div
-                @click="deleteRecipe(recipe.id) && $router.push('/')"
+                @click="handleDelete"
                 class="
                     text-red-600 cursor-pointer mx-auto w-[60%] mb-[20px]
                     rounded-[20px] hover:bg-red-600 hover:text-white transition-colors
@@ -84,39 +84,39 @@
 </template>
 
 <script setup lang="ts">
-import { useRecipes } from '~/composables/useRecipes';
-import type { Recipe } from '~/shared/types';
-import { ref, onMounted, watch, nextTick } from 'vue';
-import { useRoute } from 'vue-router';
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { useRecipes } from '~/composables/useRecipes'
 
-const route = useRoute();
-const { getRecipeById, deleteRecipe } = useRecipes();
+const route = useRoute()
+const { getRecipeById, deleteRecipe } = useRecipes()
 
-const recipe = ref<Recipe | null>(null);
-const loading = ref(true);
+// Делаем ID реактивным, чтобы Nuxt знал, когда он меняется
+const recipeId = computed(() => Number(route.query.id))
 
-// Загружаем данные рецепта при монтировании компонента
-onMounted(() => {
-    loadRecipe();
-});
+// Вся логика onMounted, watch и loading заменяется одним хуком useAsyncData!
+const { data: recipe, pending: loading } = await useAsyncData(
+  `recipe-${recipeId.value}`, // уникальный ключ для кэша
+  () => getRecipeById(recipeId.value),
+  {
+    watch: [recipeId] // автоматически перезапрашивать данные, если ID в URL изменится
+  }
+)
 
-// Следим за изменением query параметра
-watch(() => route.query.id, () => {
-    loadRecipe();
-});
-
-const loadRecipe = async () => {
-    const recipeId = Number(route.query.id);
-    loading.value = true;
+const handleDelete = async () => {
+  // На всякий случай проверяем, что данные рецепта успели загрузиться
+  if (!recipe.value?.id) return
+  
+  try {
+    // Ждем, пока сервер реально удалит рецепт в базе
+    const result = await deleteRecipe(recipe.value.id)
     
-    await nextTick();
-
-    if (!isNaN(recipeId)) {
-        const foundRecipe = getRecipeById(recipeId);
-        recipe.value = foundRecipe || null;
-        loading.value = false;
-    } else {
-        loading.value = false;
+    // Если сервер ответил успехом, делаем безопасный переход через Nuxt
+    if (result.success) {
+      await navigateTo('/')
     }
-};
+  } catch (error) {
+    console.error('Ошибка при удалении рецепта:', error)
+  }
+}
 </script>

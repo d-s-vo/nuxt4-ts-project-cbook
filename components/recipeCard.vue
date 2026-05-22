@@ -38,7 +38,11 @@ defineProps<{
     recipe: Recipe;
 }>();
 
-const navigateToRecipe = (id: number) => {
-    router.push(`/recipe-page?id=${id}`);
-};
+const navigateToRecipe = async (id: number) => {
+  // navigateTo доступен глобально, его не нужно импортировать
+  await navigateTo({
+    path: '/recipe-page',
+    query: { id: id }
+  })
+}
 </script>

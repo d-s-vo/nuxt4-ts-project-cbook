@@ -1,102 +1,27 @@
-import { computed, onMounted, watch, onUnmounted, ref } from 'vue';
-import { useState } from 'nuxt/app';
-import type { Recipe } from '../shared/types';
-
-const STORAGE_KEY = 'recipe-app-recipes';
+import type { Recipe } from '~/shared/types/recipe.types'
 
 export const useRecipes = () => {
-    // Use a ref to track initialization
-    const isInitialized = ref(false);
+
+    // Получить все рецепты
+    const getAllRecipes = async () => {
+        return useFetch<Recipe[]>('/api/recipes');
+    }
     
-    // Use useState with a factory function for SSR support
-    const recipes = useState<Recipe[]>('recipes', () => []);
+    // Получить один рецепт по ID
+    const getRecipeById = async (id: number) => {
+        return await $fetch<Recipe>(`/api/recipes/${id}`)
+    }
 
-    // Initialize recipes only once
-    const initializeRecipes = () => {
-        if (isInitialized.value) return;
-        
-        if (process.client) {
-            try {
-                const saved = localStorage.getItem(STORAGE_KEY);
-                recipes.value = saved ? JSON.parse(saved) : [];
-            } catch (e) {
-                console.error('Failed to load recipes:', e);
-                recipes.value = [];
-            }
-        } else {
-            recipes.value = [];
-        }
-        
-        isInitialized.value = true;
-    };
-
-    // Save recipes to localStorage
-    const saveToLocalStorage = () => {
-        try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes.value));
-        } catch (e) {
-            console.error('Failed to save recipes:', e);
-        }
-    };
-
-    // Initialize on mount
-    onMounted(() => {
-        initializeRecipes();
-        
-        // Setup watcher
-        const stopWatcher = watch(() => [...recipes.value], () => {
-            saveToLocalStorage();
-        }, { deep: true });
-
-        // Cleanup on unmount
-        onUnmounted(() => {
-            stopWatcher();
-        });
-    });
-
-    // Add new recipe with auto-increment ID
-    const addRecipe = (newRecipe: Omit<Recipe, 'id'>): Recipe => {
-        const newId = recipes.value.length > 0 
-            ? Math.max(...recipes.value.map(r => r.id)) + 1 
-            : 1;
-        
-        const recipe: Recipe = {
-            ...newRecipe,
-            id: newId,
-            imageUrl: newRecipe.imageUrl || '/images/placeholder.jpg'
-        };
-
-        recipes.value = [...recipes.value, recipe];
-        return recipe;
-    };
-
-    // Get recipe by ID
-    const getRecipeById = (id: number): Recipe | undefined => {
-        return recipes.value.find(recipe => recipe.id === id);
-    };
-
-    // Search recipes
-    const getRecipesByTitle = (query: string): Recipe[] => {
-        if (!query.trim()) return [];
-        const searchTerm = query.toLowerCase();
-        return recipes.value.filter(recipe => 
-            recipe.title.toLowerCase().includes(searchTerm) || 
-            recipe.description.toLowerCase().includes(searchTerm)
-        );
-    };
-
-    // Delete recipe
-    const deleteRecipe = (id: number): boolean => {
-        const initialLength = recipes.value.length;
-        recipes.value = recipes.value.filter(recipe => recipe.id !== id);
-        return recipes.value.length !== initialLength;
-    };
+    // Удалить рецепт
+    const deleteRecipe = async (id: number) => {
+        return await $fetch(`/api/recipes/${id}`, {
+            method: 'DELETE'
+        })
+    }
 
     return {
-        recipes,
-        addRecipe,
+        getAllRecipes,
         getRecipeById,
-        getRecipesByTitle,
-        deleteRecipe,
-    };
-};
+        deleteRecipe
+    }
+}

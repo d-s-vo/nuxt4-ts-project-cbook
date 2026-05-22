@@ -42,7 +42,8 @@ import { ref, computed } from "vue";
 import type { Recipe } from '~/shared/types/recipe.types';
 import { useColorMode } from "@vueuse/core";
 
-const { data: recipes, pending } = await useFetch<Recipe[]>('/api/recipes');
+const { getAllRecipes } = useRecipes();
+const { data: recipes, pending } = await getAllRecipes();
 
 const searchQuery = ref('');
 
