@@ -9,7 +9,7 @@
         >
             <div class="w-[100px] aspect-square shrink-0">
                 <img
-                    v-if="recipe.imageUrl" 
+                    v-if="recipe?.imageUrl" 
                     :src="recipe.imageUrl" 
                     :alt="recipe.title"
                     class="rounded-[10px] w-full h-full object-cover"
@@ -30,9 +30,6 @@
 </template>
 <script setup lang="ts">
 import type { Recipe } from '~/shared/types';
-import { useRouter } from 'vue-router';
-
-const router = useRouter();
 
 defineProps<{
     recipe: Recipe;

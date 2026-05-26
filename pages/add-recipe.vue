@@ -55,24 +55,34 @@
                 :error="fieldErrors[item.name]"
                 class="col-span-6"
               >
-                <UInput
-                  v-if="item.type !== 'select'"
-                  :model-value="getFormVal(item.name)"
-                  @update:model-value="(val) => setFormVal(item.name, val as string | number)"
-                  :name="item.name"
-                  :label="item.title"
-                  :type="item.type"
-                  :required="item.required"
-                  :placeholder="item.placeholder"
-                  class="w-full"
-                />
                 <USelect
-                  v-else-if="item.type === 'select' && 'options' in item"
+                  v-if="item.type === 'select' && 'options' in item"
                   :model-value="String(getFormVal(item.name) ?? '')"
                   @update:model-value="(val) => setFormVal(item.name, val as string)"
                   :items="item.options"
                   :name="item.name"
                   :label="item.title"
+                  :required="item.required"
+                  :placeholder="item.placeholder"
+                  class="w-full"
+                />
+                <UInput
+                  v-else-if="item.type === 'file'"
+                  @change="onFileChange"
+                  :name="item.name"
+                  :label="item.title"
+                  :required="item.required"
+                  :placeholder="item.placeholder"
+                  type="file" 
+                  accept="image/jpeg, image/webp, image/avif" 
+                />
+                <UInput
+                  v-else
+                  :model-value="getFormVal(item.name)"
+                  @update:model-value="(val) => setFormVal(item.name, val as string | number)"
+                  :name="item.name"
+                  :label="item.title"
+                  :type="item.type"
                   :required="item.required"
                   :placeholder="item.placeholder"
                   class="w-full"
@@ -214,6 +224,26 @@ const units: Unit[] = ['г', 'кг', 'мл', 'л', 'шт', 'ст.л.', 'ч.л.',
 const isSubmitting = ref(false);
 const fieldErrors = ref<Record<string, string>>({});
 
+// Обработка файлов
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 МБ в байтах
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
+
+const onFileChange = (event: Event | FileList) => {
+  // 1. Если Nuxt UI прислал FileList напрямую
+  if (event instanceof FileList) {
+    form.value.imageFile = event.length > 0 ? event[0] : null;
+    return;
+  }
+
+  // 2. Если пришло классическое событие Event
+  const input = event.target as HTMLInputElement;
+  if (input && input.files && input.files.length > 0) {
+    form.value.imageFile = input.files[0];
+  } else {
+    form.value.imageFile = null;
+  }
+};
+
 const schema = z.object({
   title: z.string().min(1, 'Название блюда обязательно'),
   description: z.string().min(1, 'Описание блюда обязательно'),
@@ -226,12 +256,17 @@ const schema = z.object({
     unit: z.enum(units, { message: 'Единица измерения обязательно'})
   })),
   steps: z.array(z.string().min(1, 'Шаг обязательно')),
-  imageUrl: z.union(
-      [
-        z.string().url('Неверная ссылка на изображение'), 
-        z.null()
-      ]
-  ).optional()
+  imageUrl: z.string().url('Неверная ссылка на изображение').nullish(),
+  imageFile: z.any()
+    // Проверяем, что если значение есть, то это именно объект File
+    .refine((file) => !file || file instanceof File, 'Ожидается файл изображения')
+    // Проверяем размер
+    .refine((file) => !file || file.size <= MAX_FILE_SIZE, 'Размер файла не должен превышать 5 МБ')
+    // Проверяем MIME-тип
+    .refine(
+      (file) => !file || ACCEPTED_IMAGE_TYPES.includes(file.type), 
+      'Поддерживаются только форматы .jpg, .png и .webp'
+    )
 });
 
 const form = ref<Omit<Recipe, 'id'>>({
@@ -244,7 +279,8 @@ const form = ref<Omit<Recipe, 'id'>>({
     { name: '', quantity: 0, unit: 'г' as const }
   ],
   steps: [''],
-  imageUrl: null
+  imageUrl: null,
+  imageFile: null as File | null // Файл живет прямо здесь!
 });
 
 // --- СТРОГИЕ ХЕЛПЕРЫ ДЛЯ ДИНАМИЧЕСКОГО БАЙНДИНГА (БЕЗ ANY) ---
@@ -303,7 +339,8 @@ const resetForm = () => {
         { name: '', quantity: 0, unit: 'г' as const }
       ],
       steps: [''],
-      imageUrl: null
+      imageUrl: null,
+      imageFile: null
     };
     fieldErrors.value = {};
     formKey.value++;
@@ -323,17 +360,35 @@ const submitForm = async () => {
         fieldErrors.value[key] = err.message;
       });
       return;
-    }    
+    } 
+    
+    // 2. Подготовка данных
+    const formData = new FormData();
 
-    // 2. ОТПРАВКА ДАННЫХ НА СЕРВЕР (Новая логика)
+    for (const [key, value] of Object.entries(form.value)) {
+      if (value === null || value === undefined) continue;
+
+      if (typeof value === 'object' && !(value instanceof File)) {
+        formData.append(key, JSON.stringify(value));
+      } else if (value instanceof File) {
+        // Ключ 'imageFile' на сервере мы поймаем как part.name === 'imageFile'
+        formData.append(key, value);
+      } else {
+        formData.append(key, String(value));
+      }
+    }
+
+
+    // 3. ОТПРАВКА ДАННЫХ НА СЕРВЕР
     await $fetch('/api/recipes', {
       method: 'POST',
-      body: form.value
+      body: formData
     });
     
-    // 3. Редирект и уведомление
+    // 4. Редирект и уведомление
     await router.push('/');
     alert('Рецепт успешно добавлен!');
+    console.log(Array.from(formData.entries()));
     
   } catch (error) {
     console.error('Ошибка при сохранении рецепта:', error);

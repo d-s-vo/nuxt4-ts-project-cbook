@@ -10,7 +10,11 @@ export default defineNuxtConfig({
   dev: true,
   vite: {
     server: {
-      hmr: true
+      hmr: true,
+      watch: {
+        // Заставляем Vite игнорировать любые изменения в папке minio_data
+        ignored: ['**/minio_data/**'] 
+      }
     },
     optimizeDeps: {
       include: [

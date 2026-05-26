@@ -22,4 +22,5 @@ export interface Recipe {
   ingredients: Ingredient[];
   steps: string[]; // Массив строк с шагами приготовления
   imageUrl?: string | null; // Ссылка на изображение (можно использовать локальные файлы из /public)
+  imageFile?: File | null; // Файл изображения
 }

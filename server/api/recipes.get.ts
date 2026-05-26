@@ -8,13 +8,9 @@ export default defineEventHandler(async () => {
     // Просим Prisma достать все рецепты из таблицы Recipe
     const recipes = await prisma.recipe.findMany({
       // Сразу подтягиваем связанные ингредиенты
-      include: {
-        ingredients: true
-      },
+      include: { ingredients: true },
       // Сортируем так, чтобы свежие рецепты были сверху
-      orderBy: {
-        createdAt: 'desc'
-      }
+      orderBy: { createdAt: 'desc' }
     })
     
     return recipes
