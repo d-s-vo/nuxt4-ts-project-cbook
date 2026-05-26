@@ -7,12 +7,14 @@
         <div
             class="flex gap-[20px] group-hover:bg-[#f0f0f0] dark:group-hover:bg-[#333] p-[20px] rounded-[10px]"
         >
-            <img
-                v-if="recipe.imageUrl" 
-                :src="recipe.imageUrl" 
-                :alt="recipe.title"
-                class="max-w-[100px] aspect-square shrink-0 rounded-[10px]"
-            >
+            <div class="w-[100px] aspect-square shrink-0">
+                <img
+                    v-if="recipe?.imageUrl" 
+                    :src="recipe.imageUrl" 
+                    :alt="recipe.title"
+                    class="rounded-[10px] w-full h-full object-cover"
+                >
+            </div>
             <div>
                 <h2
                     v-if="recipe?.title"
@@ -27,16 +29,17 @@
     </div>
 </template>
 <script setup lang="ts">
-import type { Recipe } from '~/types';
-import { useRouter } from 'vue-router';
-
-const router = useRouter();
+import type { Recipe } from '~/shared/types';
 
 defineProps<{
     recipe: Recipe;
 }>();
 
-const navigateToRecipe = (id: number) => {
-    router.push(`/recipe-page?id=${id}`);
-};
+const navigateToRecipe = async (id: number) => {
+  // navigateTo доступен глобально, его не нужно импортировать
+  await navigateTo({
+    path: '/recipe-page',
+    query: { id: id }
+  })
+}
 </script>

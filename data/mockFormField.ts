@@ -1,4 +1,4 @@
-import type { FormGroup } from "../types";
+import type { FormGroup } from "../shared/types";
 
 export const mockFormField: FormGroup[] = [
     {
@@ -60,6 +60,13 @@ export const mockFormField: FormGroup[] = [
                 "title": "Ссылка на изображение",
                 "required": false,
                 "placeholder": "Вставьте ссылку на изображение"
+            },
+            {
+                type: 'file',
+                name: 'imageFile',
+                title: 'Загрузить изображение',
+                required: false,
+                placeholder: 'Выберите файл'
             }
         ]
     },

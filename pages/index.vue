@@ -38,33 +38,33 @@
     </div>
 </template>
 <script setup lang="ts">
-import { useRecipes } from "~/composables/useRecipes";
 import { ref, computed } from "vue";
-import type { Recipe } from '~/types';
+import type { Recipe } from '~/shared/types/recipe.types';
 import { useColorMode } from "@vueuse/core";
 
-const {recipes} = useRecipes();
-
-const {
-    getRecipesByTitle,
-    getRecipeById
-} = useRecipes();
+const { getAllRecipes } = useRecipes();
+const { data: recipes, pending } = await getAllRecipes();
 
 const searchQuery = ref('');
+
 const filteredRecipes = computed<Recipe[]>(() => {
-    const query = searchQuery.value.trim();
-    if (!query) return recipes.value;
+    const query = searchQuery.value.trim().toLowerCase();
+    
+    // Безопасная проверка: если данных еще нет, отдаем пустой массив
+    if (!query || !recipes.value) return recipes.value || [];
+
     const id = parseInt(query);
     if (!isNaN(id)) {
-        const recipe = getRecipeById(id);
-        if (recipe) return [recipe];
-    };
-    return getRecipesByTitle(query);
+        // Явно указываем (r: Recipe)
+        const recipe = recipes.value.find((r: Recipe) => r.id === id);
+        return recipe ? [recipe] : [];
+    }
+    
+    // Явно указываем (r: Recipe)
+    return recipes.value.filter((r: Recipe) => r.title.toLowerCase().includes(query));
 });
 
 const colorMode = useColorMode();
-
-// Изменение темы
 const toggleTheme = () => {
   colorMode.value = colorMode.value === 'dark' ? 'light' : 'dark'
 }

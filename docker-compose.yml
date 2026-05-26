@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  # Сервис 1: Локальное S3 хранилище MinIO
+  minio:
+    image: minio/minio:latest
+    container_name: local-s3-minio
+    ports:
+      - "9000:9000" # API для загрузки файлов
+      - "9001:9001" # Веб-админка
+    environment:
+      MINIO_ROOT_USER: "local_access_key"
+      MINIO_ROOT_PASSWORD: "local_secret_key_123"
+    volumes:
+      - ./minio_data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Сервис 2: Cloudflare Tunnel (НОВЫЙ БЛОК)
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: local-s3-tunnel
+    depends_on:
+      minio:
+        condition: service_healthy
+    # Команда просит Cloudflare создать туннель до нашего MinIO
+    command: tunnel --url http://minio:9000

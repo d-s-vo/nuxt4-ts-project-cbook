@@ -11,7 +11,7 @@ export type StepKeys = 'step';
 
 // --- Общие поля формы ---
 interface BaseField<TName extends string = string> {
-  type: 'text' | 'number' | 'textarea' | 'select';
+  type: 'text' | 'number' | 'textarea' | 'select' | 'file';
   name: TName;
   title: string;
   required?: boolean;

@@ -55,22 +55,34 @@
                 :error="fieldErrors[item.name]"
                 class="col-span-6"
               >
-                <UInput
-                  v-if="item.type !== 'select'"
-                  v-model="form[item.name]"
+                <USelect
+                  v-if="item.type === 'select' && 'options' in item"
+                  :model-value="String(getFormVal(item.name) ?? '')"
+                  @update:model-value="(val) => setFormVal(item.name, val as string)"
+                  :items="item.options"
                   :name="item.name"
                   :label="item.title"
-                  :type="item.type"
                   :required="item.required"
                   :placeholder="item.placeholder"
                   class="w-full"
                 />
-                <USelect
-                  v-else-if="item.type === 'select' && 'options' in item"
-                  v-model="form[item.name]"
-                  :items="item.options"
+                <UInput
+                  v-else-if="item.type === 'file'"
+                  @change="onFileChange"
                   :name="item.name"
                   :label="item.title"
+                  :required="item.required"
+                  :placeholder="item.placeholder"
+                  type="file" 
+                  accept="image/jpeg, image/webp, image/avif" 
+                />
+                <UInput
+                  v-else
+                  :model-value="getFormVal(item.name)"
+                  @update:model-value="(val) => setFormVal(item.name, val as string | number)"
+                  :name="item.name"
+                  :label="item.title"
+                  :type="item.type"
                   :required="item.required"
                   :placeholder="item.placeholder"
                   class="w-full"
@@ -85,9 +97,9 @@
               v-for="(ingredient, ingIndex) in form.ingredients" 
               :key="ingIndex" 
             >
+              <!-- Убрали :state="ingredient", так как nested формы используют state родителя -->
               <UForm
                 nested
-                :state="ingredient"
                 :name="`ingredient-${ingIndex}`"
                 class="grid grid-cols-12 gap-4 mb-4 items-start"
               >
@@ -105,7 +117,8 @@
                   >
                     <UInput
                       v-if="field.type !== 'select'"
-                      v-model="ingredient[field.name]"
+                      :model-value="getIngVal(ingredient, field.name)"
+                      @update:model-value="(val) => setIngVal(ingredient, field.name, val as string | number)"
                       :name="`ingredient-${ingIndex}-${field.name}`"
                       :label="field.title"
                       :type="field.type"
@@ -115,7 +128,8 @@
                     />
                     <USelect
                       v-else-if="field.type === 'select' && 'options' in field"
-                      v-model="ingredient[field.name]"
+                      :model-value="String(getIngVal(ingredient, field.name) ?? '')"
+                      @update:model-value="(val) => setIngVal(ingredient, field.name, val as string)"
                       :items="field.options"
                       :name="`ingredient-${ingIndex}-${field.name}`"
                       :label="field.title"
@@ -130,7 +144,7 @@
                 <UButton
                   v-if="form.ingredients.length > 1"
                   @click="removeIngredient(ingIndex)"
-                  color="red"
+                  color="error"
                   variant="ghost"
                   icon="i-heroicons-trash"
                   size="sm"
@@ -164,7 +178,7 @@
               <UButton
                 v-if="form.steps.length > 1"
                 @click="removeStep(index)"
-                color="red"
+                color="error"
                 variant="ghost"
                 icon="i-heroicons-trash"
                 size="sm"
@@ -180,7 +194,7 @@
     >
       <UButton
         @click="resetForm"
-        color="red"
+        color="error"
         label="Сбросить"
         class="bg-red-300 text-white hover:bg-red-500 hover:cursor-pointer"
       />
@@ -200,17 +214,35 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import type { Recipe, Ingredient, Unit, FormGroup, SelectField } from '~/types';
-import { useRecipes } from '~/composables/useRecipes';
+import type { Recipe, Ingredient, Unit, FormGroup, SelectField } from '~/shared/types';
 import { mockFormField } from '~/data/mockFormField';
 import * as z from 'zod';
 
 const router = useRouter();
-const { addRecipe } = useRecipes();
 
 const units: Unit[] = ['г', 'кг', 'мл', 'л', 'шт', 'ст.л.', 'ч.л.', 'по вкусу'] as const;
 const isSubmitting = ref(false);
 const fieldErrors = ref<Record<string, string>>({});
+
+// Обработка файлов
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 МБ в байтах
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
+
+const onFileChange = (event: Event | FileList) => {
+  // 1. Если Nuxt UI прислал FileList напрямую
+  if (event instanceof FileList) {
+    form.value.imageFile = event.length > 0 ? event[0] : null;
+    return;
+  }
+
+  // 2. Если пришло классическое событие Event
+  const input = event.target as HTMLInputElement;
+  if (input && input.files && input.files.length > 0) {
+    form.value.imageFile = input.files[0];
+  } else {
+    form.value.imageFile = null;
+  }
+};
 
 const schema = z.object({
   title: z.string().min(1, 'Название блюда обязательно'),
@@ -224,13 +256,17 @@ const schema = z.object({
     unit: z.enum(units, { message: 'Единица измерения обязательно'})
   })),
   steps: z.array(z.string().min(1, 'Шаг обязательно')),
-  // z.union для валидации url или null
-  imageUrl: z.union(
-      [
-        z.string().url('Неверная ссылка на изображение'), 
-        z.null()
-      ]
-  ).optional()
+  imageUrl: z.string().url('Неверная ссылка на изображение').nullish(),
+  imageFile: z.any()
+    // Проверяем, что если значение есть, то это именно объект File
+    .refine((file) => !file || file instanceof File, 'Ожидается файл изображения')
+    // Проверяем размер
+    .refine((file) => !file || file.size <= MAX_FILE_SIZE, 'Размер файла не должен превышать 5 МБ')
+    // Проверяем MIME-тип
+    .refine(
+      (file) => !file || ACCEPTED_IMAGE_TYPES.includes(file.type), 
+      'Поддерживаются только форматы .jpg, .png и .webp'
+    )
 });
 
 const form = ref<Omit<Recipe, 'id'>>({
@@ -243,8 +279,31 @@ const form = ref<Omit<Recipe, 'id'>>({
     { name: '', quantity: 0, unit: 'г' as const }
   ],
   steps: [''],
-  imageUrl: null
+  imageUrl: null,
+  imageFile: null as File | null // Файл живет прямо здесь!
 });
+
+// --- СТРОГИЕ ХЕЛПЕРЫ ДЛЯ ДИНАМИЧЕСКОГО БАЙНДИНГА (БЕЗ ANY) ---
+const getFormVal = (key: string): string | number | undefined => {
+  // Двойной каст: form.value -> unknown -> Record
+  const val = (form.value as unknown as Record<string, unknown>)[key];
+  return (typeof val === 'string' || typeof val === 'number') ? val : undefined;
+};
+
+const setFormVal = (key: string, val: string | number) => {
+  (form.value as unknown as Record<string, unknown>)[key] = val;
+};
+
+const getIngVal = (ingredient: Ingredient, key: string): string | number | undefined => {
+  // Двойной каст: ingredient -> unknown -> Record
+  const val = (ingredient as unknown as Record<string, unknown>)[key];
+  return (typeof val === 'string' || typeof val === 'number') ? val : undefined;
+};
+
+const setIngVal = (ingredient: Ingredient, key: string, val: string | number) => {
+  (ingredient as unknown as Record<string, unknown>)[key] = val;
+};
+// -------------------------------------------------------------
 
 const addIngredient = () => {
   form.value.ingredients.push({ name: '', quantity: 0, unit: 'г' });
@@ -280,8 +339,10 @@ const resetForm = () => {
         { name: '', quantity: 0, unit: 'г' as const }
       ],
       steps: [''],
-      imageUrl: ''
+      imageUrl: null,
+      imageFile: null
     };
+    fieldErrors.value = {};
     formKey.value++;
   }
 };
@@ -289,27 +350,46 @@ const resetForm = () => {
 const submitForm = async () => {
   try {
     isSubmitting.value = true;
+    fieldErrors.value = {};
 
-    // Проверяем валидность формы
+    // 1. Валидация формы
     const result = schema.safeParse(form.value);
     if (!result.success) {
-      // console.log(result.error);
-
       result.error.issues.forEach((err) => {
         const key = err.path.join('.');
         fieldErrors.value[key] = err.message;
       });
       return;
-    }    
+    } 
+    
+    // 2. Подготовка данных
+    const formData = new FormData();
 
-    // Добавляем рецепт через композабл
-    addRecipe(form.value);
+    for (const [key, value] of Object.entries(form.value)) {
+      if (value === null || value === undefined) continue;
+
+      if (typeof value === 'object' && !(value instanceof File)) {
+        formData.append(key, JSON.stringify(value));
+      } else if (value instanceof File) {
+        // Ключ 'imageFile' на сервере мы поймаем как part.name === 'imageFile'
+        formData.append(key, value);
+      } else {
+        formData.append(key, String(value));
+      }
+    }
+
+
+    // 3. ОТПРАВКА ДАННЫХ НА СЕРВЕР
+    await $fetch('/api/recipes', {
+      method: 'POST',
+      body: formData
+    });
     
-    // Перенаправляем на главную страницу
+    // 4. Редирект и уведомление
     await router.push('/');
-    
-    // Показываем уведомление об успешном добавлении
     alert('Рецепт успешно добавлен!');
+    console.log(Array.from(formData.entries()));
+    
   } catch (error) {
     console.error('Ошибка при сохранении рецепта:', error);
     alert('Произошла ошибка при сохранении рецепта. Пожалуйста, попробуйте снова.');
