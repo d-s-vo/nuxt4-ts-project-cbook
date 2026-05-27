@@ -66,15 +66,15 @@
                   :placeholder="item.placeholder"
                   class="w-full"
                 />
-                <UInput
+                <UFileUpload
                   v-else-if="item.type === 'file'"
-                  @change="onFileChange"
+                  variant="button"
+                  icon="i-heroicons-cloud-arrow-up"
+                  :label="item.placeholder || item.title"
                   :name="item.name"
-                  :label="item.title"
                   :required="item.required"
-                  :placeholder="item.placeholder"
-                  type="file" 
-                  accept="image/jpeg, image/webp, image/avif" 
+                  class="w-full"
+                  @update:model-value="onFileChange"
                 />
                 <UInput
                   v-else
@@ -228,20 +228,8 @@ const fieldErrors = ref<Record<string, string>>({});
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 МБ в байтах
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
 
-const onFileChange = (event: Event | FileList) => {
-  // 1. Если Nuxt UI прислал FileList напрямую
-  if (event instanceof FileList) {
-    form.value.imageFile = event.length > 0 ? event[0] : null;
-    return;
-  }
-
-  // 2. Если пришло классическое событие Event
-  const input = event.target as HTMLInputElement;
-  if (input && input.files && input.files.length > 0) {
-    form.value.imageFile = input.files[0];
-  } else {
-    form.value.imageFile = null;
-  }
+const onFileChange = (file: File | null | undefined) => {
+  form.value.imageFile = file || null;
 };
 
 const schema = z.object({
@@ -256,7 +244,6 @@ const schema = z.object({
     unit: z.enum(units, { message: 'Единица измерения обязательно'})
   })),
   steps: z.array(z.string().min(1, 'Шаг обязательно')),
-  imageUrl: z.string().url('Неверная ссылка на изображение').nullish(),
   imageFile: z.any()
     // Проверяем, что если значение есть, то это именно объект File
     .refine((file) => !file || file instanceof File, 'Ожидается файл изображения')
@@ -279,7 +266,6 @@ const form = ref<Omit<Recipe, 'id'>>({
     { name: '', quantity: 0, unit: 'г' as const }
   ],
   steps: [''],
-  imageUrl: null,
   imageFile: null as File | null // Файл живет прямо здесь!
 });
 
@@ -339,7 +325,6 @@ const resetForm = () => {
         { name: '', quantity: 0, unit: 'г' as const }
       ],
       steps: [''],
-      imageUrl: null,
       imageFile: null
     };
     fieldErrors.value = {};

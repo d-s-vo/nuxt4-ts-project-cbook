@@ -55,13 +55,6 @@ export const mockFormField: FormGroup[] = [
                 "placeholder": "Добавьте описание"
             },
             {
-                "type": "text",
-                "name": "imageUrl",
-                "title": "Ссылка на изображение",
-                "required": false,
-                "placeholder": "Вставьте ссылку на изображение"
-            },
-            {
                 type: 'file',
                 name: 'imageFile',
                 title: 'Загрузить изображение',
