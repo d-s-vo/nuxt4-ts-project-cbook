@@ -64,7 +64,7 @@ export default defineEventHandler(async (event) => {
 
       try {
         await s3.send(new PutObjectCommand({
-          Bucket: process.env.S3_BUCKET_NAME,
+          Bucket: process.env.S3_BUCKET,
           Key: uniqueFileName,
           Body: fileBuffer,
           ContentType: fileMimeType!,
@@ -72,7 +72,7 @@ export default defineEventHandler(async (event) => {
         }))
         
         // Формируем готовую ссылку через Ngrok
-        finalImageUrl = `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET_NAME}/${uniqueFileName}`
+        finalImageUrl = `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET}/${uniqueFileName}`
       } catch (err) {
         console.error('Ошибка загрузки в S3:', err)
         throw createError({ statusCode: 500, statusMessage: 'Не удалось загрузить изображение в облако' })
@@ -114,9 +114,11 @@ export default defineEventHandler(async (event) => {
     console.error('Ошибка сохранения в БД:', error)
     if (error && typeof error === 'object' && 'statusCode' in error) throw error;
     
+    const message = error instanceof Error ? error.message : String(error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Внутренняя ошибка сервера при сохранении рецепта'
+      statusMessage: 'Внутренняя ошибка сервера при сохранении рецепта',
+      data: { detail: message }
     })
   }
 })
