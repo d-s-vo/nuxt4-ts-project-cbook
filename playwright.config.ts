@@ -12,5 +12,9 @@ export default defineConfig({
     port: 3000,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    env: {
+      ...process.env,
+      S3_BUCKET: process.env.S3_BUCKET || 'recipes',
+    },
   },
 });

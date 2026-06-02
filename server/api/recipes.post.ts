@@ -74,8 +74,18 @@ export default defineEventHandler(async (event) => {
         // Формируем готовую ссылку через Ngrok
         finalImageUrl = `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET}/${uniqueFileName}`
       } catch (err) {
-        console.error('Ошибка загрузки в S3:', err)
-        throw createError({ statusCode: 500, statusMessage: 'Не удалось загрузить изображение в облако' })
+        const s3Error = err as Error;
+        console.error('Ошибка загрузки в S3:', s3Error)
+        // ПРОБРАСЫВАЕМ ОШИБКУ S3 ПРЯМО В PLAYWRIGHT
+        throw createError({ 
+          statusCode: 500, 
+          statusMessage: 'Не удалось загрузить изображение в облако',
+          data: { 
+            realS3Error: s3Error.message, 
+            s3ErrorCode: s3Error.name,
+            bucketName: process.env.S3_BUCKET || 'ПУСТО!' // Заодно проверим переменную!
+          }
+        })
       }
     }
 

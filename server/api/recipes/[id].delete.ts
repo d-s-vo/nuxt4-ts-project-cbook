@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
         const objectKey = decodeURIComponent(urlObj.pathname.replace(bucketPrefix, ''))
 
         await s3.send(new DeleteObjectCommand({
-          Bucket: process.env.S3_BUCKET_NAME,
+          Bucket: process.env.S3_BUCKET,
           Key: objectKey
         }))
         
