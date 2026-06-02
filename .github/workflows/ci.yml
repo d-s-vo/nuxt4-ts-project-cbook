@@ -57,13 +57,23 @@ jobs:
       # E2E-тесты (передаем доступы к локальному MinIO прямо в память)
       - name: Run Playwright Tests
         env:
-          DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/test_recipes?schema=public"
+          DATABASE_URL: "postgresql://test_user:test_password@127.0.0.1:5432/test_recipes?schema=public"
           S3_ACCESS_KEY: test_access_key
           S3_SECRET_KEY: test_secret_key_123
-          S3_ENDPOINT: http://localhost:9000
+          S3_ENDPOINT: http://127.0.0.1:9000
           S3_BUCKET: recipes
           S3_REGION: us-east-1
+          S3_PUBLIC_URL: http://127.0.0.1:9000/recipes
         run: pnpm exec playwright test
+
+      # СПАСАЕМ УЛИКИ (Выполнится только если тест упал)
+      - name: Upload Playwright Report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results
+          path: test-results/
+          retention-days: 7
 
       - name: Teardown Infrastructure
         if: always()
