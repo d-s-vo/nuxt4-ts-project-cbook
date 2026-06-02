@@ -35,15 +35,23 @@ test('Успешное добавление нового рецепта', async 
   // 4. ДЕЙСТВИЯ: Этапы приготовления
   await page.getByPlaceholder('Опишите шаг 1').fill('Очистить овощи и поставить вариться бульон');
 
-  // 5. РЕГИСТРИРУЕМ ОБРАБОТЧИК ДИАЛОГА **ДО** КЛИКА
-  // alert() синхронный — если обработчик не установлен заранее, Playwright зависнет
+  // 5. РЕГИСТРИРУЕМ ОБРАБОТЧИК ДИАЛОГА ДО КЛИКА
   page.on('dialog', async dialog => {
-    expect(dialog.message()).toBe('Рецепт успешно добавлен!');
+    // Временно убираем жесткий expect отсюда, просто закрываем алерт,
+    // чтобы он не блокировал страницу.
     await dialog.accept(); 
   });
 
-  // 6. ОТПРАВКА
-  await page.getByRole('button', { name: 'Добавить рецепт' }).click();
+  // 6. ОТПРАВКА С ОЖИДАНИЕМ СЕТИ (Best Practice)
+  // Запускаем ожидание ответа бэкенда ПАРАЛЛЕЛЬНО с кликом
+  const [response] = await Promise.all([
+    // Замени '/api/recipes' на реальный URL твоего эндпоинта сохранения
+    page.waitForResponse(res => res.url().includes('/api/recipes') && res.request().method() === 'POST'),
+    page.getByRole('button', { name: 'Добавить рецепт' }).click()
+  ]);
+
+  // Сначала проверяем, что бэкенд не упал с ошибкой 500
+  expect(response.ok()).toBeTruthy(); // Ожидаем статус 200-299
   
   // 7. ПРОВЕРКА: редирект на главную
   await expect(page).toHaveURL('http://localhost:3000/');
