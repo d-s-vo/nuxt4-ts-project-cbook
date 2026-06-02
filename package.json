@@ -11,7 +11,9 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare && prisma generate",
     "typecheck": "nuxt typecheck",
-    "studio": "prisma studio"
+    "studio": "prisma studio",
+    "test:e2e": "tsx ./scripts/run-e2e.ts",
+    "test:env:down": "docker compose -f docker-compose.test.yml down"
   },
   "packageManager": "pnpm@9.0.0",
   "dependencies": {
@@ -29,11 +31,15 @@
   },
   "devDependencies": {
     "@nuxtjs/router": "^1.7.0",
+    "@playwright/test": "^1.60.0",
     "@types/node": "^24.5.2",
     "@types/pg": "^8.20.0",
     "prisma": "^7.8.0",
+    "tsx": "^4.22.4",
     "typescript": "^5.9.3",
-    "vue-tsc": "^2.2.12"
+    "vitest": "^4.1.8",
+    "vue-tsc": "^2.2.12",
+    "zx": "^8.8.5"
   },
   "keywords": [
     "vue",

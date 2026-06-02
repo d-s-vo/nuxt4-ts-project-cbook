@@ -1,0 +1,69 @@
+name: Nuxt CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      # Устанавливаем браузеры для E2E тестов и системные зависимости Ubuntu
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install --with-deps
+
+      # ПОДНИМАЕМ ТЕСТОВЫЕ КОНТЕЙНЕРЫ (Новый элегантный подход)
+      - name: Start Test Infrastructure
+        run: |
+          # 1. Ждем, пока БД и сервер MinIO загорятся зеленым (healthy)
+          docker compose -f docker-compose.test.yml up -d --wait test-db test-minio
+          # 2. Запускаем скрипт создания бакета
+          docker compose -f docker-compose.test.yml up test-minio-init
+
+      # Подготавливаем базу данных (без костылей с копированием .env)
+      - name: Prisma Setup
+        env:
+          DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/test_recipes?schema=public"
+        run: |
+          pnpm prisma generate
+          pnpm exec prisma migrate deploy
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Run Unit Tests
+        run: pnpm vitest run
+
+      # E2E-тесты (передаем доступы к локальному MinIO прямо в память)
+      - name: Run Playwright Tests
+        env:
+          S3_ACCESS_KEY: test_access_key
+          S3_SECRET_KEY: test_secret_key_123
+          S3_ENDPOINT: http://localhost:9000
+          S3_BUCKET: recipes
+          S3_REGION: us-east-1
+        run: pnpm exec playwright test
+
+      - name: Teardown Infrastructure
+        if: always()
+        run: docker compose -f docker-compose.test.yml down
