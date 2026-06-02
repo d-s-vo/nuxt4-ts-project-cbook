@@ -50,6 +50,18 @@ test('Успешное добавление нового рецепта', async 
     page.getByRole('button', { name: 'Добавить рецепт' }).click()
   ]);
 
+  // ДИАГНОСТИКА: Если сервер ответил ошибкой, выводим её в лог перед падением теста
+  if (!response.ok()) {
+    const status = response.status();
+    let errorDetails = '';
+    try {
+      errorDetails = await response.text();
+    } catch {
+      errorDetails = 'Не удалось прочитать тело ответа';
+    }
+    console.error(`\n❌ БЭКЕНД ВЕРНУЛ ОШИБКУ ${status}:\n${errorDetails}\n`);
+  }
+
   // Сначала проверяем, что бэкенд не упал с ошибкой 500
   expect(response.ok()).toBeTruthy(); // Ожидаем статус 200-299
   
