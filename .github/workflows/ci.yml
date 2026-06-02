@@ -57,6 +57,7 @@ jobs:
       # E2E-тесты (передаем доступы к локальному MinIO прямо в память)
       - name: Run Playwright Tests
         env:
+          DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/test_recipes?schema=public"
           S3_ACCESS_KEY: test_access_key
           S3_SECRET_KEY: test_secret_key_123
           S3_ENDPOINT: http://localhost:9000
