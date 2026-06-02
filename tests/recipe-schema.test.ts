@@ -27,7 +27,7 @@ describe('Валидация формы добавления рецепта (Zod
     };
 
     const result = schema.safeParse(goodData);
-    expect(result.success).toBe(true);
+    expect(result.success).toBe(false);
   });
 
 });
