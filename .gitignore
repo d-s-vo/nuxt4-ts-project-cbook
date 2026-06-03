@@ -34,3 +34,6 @@ pnpm-lock.yaml
 
 # MinIO data
 minio_data/
+
+# Test results
+test-results/

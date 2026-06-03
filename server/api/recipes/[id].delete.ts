@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
         
         // urlObj.pathname вернет: /recipes/recipes/177...-image.avif
         // Нам нужно вырезать первый /recipes/ (имя бакета), чтобы остался только ключ
-        const bucketPrefix = `/${process.env.S3_BUCKET_NAME}/`
+        const bucketPrefix = `/${process.env.S3_BUCKET}/`
         
         // Заменяем префикс бакета на пустую строку и декодируем URL 
         // (на случай, если в имени файла были пробелы или русские буквы)
