@@ -1,4 +1,4 @@
-import type { Recipe } from '~/shared/types/recipe.types'
+import type { Recipe } from '~~/shared/types/recipe.types'
 
 export const useRecipes = () => {
 

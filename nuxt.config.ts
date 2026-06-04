@@ -2,8 +2,11 @@ import { defineNuxtConfig } from 'nuxt/config'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  future: {
+    compatibilityVersion: 4,
+  },
   typescript: {
-    typeCheck: true
+    typeCheck: false
   },
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
@@ -25,9 +28,8 @@ export default defineNuxtConfig({
       ]
     }
   },
-  css: ['./assets/css/main.css'],
-  modules: ['@nuxt/ui'],
-  srcDir: '.',
+  css: ['./app/assets/css/main.css'],
+  modules: ['@nuxt/ui', '@nuxtjs/device'],
   app: {
     pageTransition: { name: 'page', mode: 'out-in' }
   }

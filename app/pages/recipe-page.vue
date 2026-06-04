@@ -86,7 +86,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { useRecipes } from '~/composables/useRecipes'
+import { useRecipes } from '~~/app/composables/useRecipes'
 
 const route = useRoute()
 const { getRecipeById, deleteRecipe } = useRecipes()

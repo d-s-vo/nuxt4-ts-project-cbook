@@ -1,9 +1,9 @@
 <template>
-    <div class="max-w-[800px] mx-auto">
+    <div class="max-w-[800px] w-full mx-auto">
         <div
             class="flex items-center justify-between gap-[20px] bg-[#f0f0f0] dark:bg-[#333] p-[20px]"
         >
-            <h1 class="text-[36px] font-bold underline font-dancing leading-[1.3]">
+            <h1 class="des:text-[36px] mob:text-[14px] font-bold underline font-dancing leading-[1.3]">
                 Recipes:
             </h1>
 
@@ -39,7 +39,7 @@
 </template>
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import type { Recipe } from '~/shared/types/recipe.types';
+import type { Recipe } from '~~/shared/types/recipe.types';
 import { useColorMode } from "@vueuse/core";
 
 const { getAllRecipes } = useRecipes();

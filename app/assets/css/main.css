@@ -1,0 +1,14 @@
+@import "tailwindcss"; 
+@import "@nuxt/ui";
+
+@theme {
+  --font-playfair: 'Playfair Display', serif;
+  --font-dancing: 'Dancing Script', cursive;
+}
+
+@custom-variant mob (.body_mobile &);
+@custom-variant des (.body_desktop &);
+
+button {
+  @apply cursor-pointer;
+}

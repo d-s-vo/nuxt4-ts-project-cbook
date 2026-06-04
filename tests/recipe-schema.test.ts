@@ -1,6 +1,6 @@
 // tests/recipe-schema.test.ts
 import { describe, it, expect } from 'vitest';
-import { schema } from '../utils/validations';
+import { schema } from '../app/utils/validations';
 
 describe('Валидация формы добавления рецепта (Zod)', () => {
 

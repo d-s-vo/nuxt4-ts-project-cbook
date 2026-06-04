@@ -215,8 +215,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import type { Recipe, Ingredient, Unit, FormGroup, SelectField } from '~/shared/types';
-import { mockFormField } from '~/data/mockFormField';
+import type { Recipe, Ingredient, Unit, FormGroup, SelectField } from '~~/shared/types';
+import { mockFormField } from '~~/data/mockFormField';
 import { schema } from '~/utils/validations';
 
 const router = useRouter();

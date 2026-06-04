@@ -30,11 +30,13 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@nuxtjs/device": "^4.0.0",
     "@nuxtjs/router": "^1.7.0",
     "@playwright/test": "^1.60.0",
     "@types/node": "^24.5.2",
     "@types/pg": "^8.20.0",
     "prisma": "^7.8.0",
+    "sass-embedded": "^1.100.0",
     "tsx": "^4.22.4",
     "typescript": "^5.9.3",
     "vitest": "^4.1.8",

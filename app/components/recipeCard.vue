@@ -29,7 +29,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import type { Recipe } from '~/shared/types';
+import type { Recipe } from '~~/shared/types';
 
 defineProps<{
     recipe: Recipe;
