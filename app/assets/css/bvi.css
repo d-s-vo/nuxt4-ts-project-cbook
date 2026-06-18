@@ -1,0 +1,134 @@
+/**
+ * Глобальные CSS-правила для панели для слабовидящих (BVI Panel)
+ * Применяются ко всем элементам страницы при активации BVI режима
+ * Используют !important для переопределения стилей сайта
+ * Исключают .bvi-panel для защиты интерфейса панели от изменений
+ */
+
+/* ============================================
+   ТЕМЫ (Цветовые схемы)
+   ============================================ */
+
+/* Тема: Черный текст на белом фоне (white-black) */
+body.bvi-theme-white-black *:not(.bvi-panel *):not(.bvi-panel) {
+  color: #000000 !important;
+  background-color: #ffffff !important;
+  border-color: #000000 !important;
+}
+
+/* Тема: Белый текст на черном фоне (black-white) */
+body.bvi-theme-black-white *:not(.bvi-panel *):not(.bvi-panel) {
+  color: #ffffff !important;
+  background-color: #000000 !important;
+  border-color: #ffffff !important;
+}
+
+/* Тема: Темно-синий текст на голубом фоне (blue) */
+body.bvi-theme-blue *:not(.bvi-panel *):not(.bvi-panel) {
+  color: #1e3a8a !important; /* темно-синий */
+  background-color: #dbeafe !important; /* голубой */
+  border-color: #1e3a8a !important;
+}
+
+/* Отключение box-shadow для всех тем (WCAG требование) */
+body[class*='bvi-theme-'] *:not(.bvi-panel *):not(.bvi-panel) {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/* ============================================
+   ИНТЕРВАЛЫ ТЕКСТА (Spacing)
+   ============================================ */
+
+/* Средние интервалы: line-height: 1.5, letter-spacing: 0.12em */
+body.bvi-spacing-medium *:not(.bvi-panel *):not(.bvi-panel) {
+  line-height: 1.5 !important;
+  letter-spacing: 0.12em !important;
+  word-spacing: 0.1em !important;
+}
+
+/* Большие интервалы: line-height: 2.0, letter-spacing: 0.2em */
+body.bvi-spacing-large *:not(.bvi-panel *):not(.bvi-panel) {
+  line-height: 2.0 !important;
+  letter-spacing: 0.2em !important;
+  word-spacing: 0.15em !important;
+}
+
+/* ============================================
+   ИЗОБРАЖЕНИЯ (Image Mode)
+   ============================================ */
+
+/* Черно-белые изображения: grayscale filter */
+body.bvi-images-grayscale img:not(.bvi-panel *):not(.bvi-panel),
+body.bvi-images-grayscale svg:not(.bvi-panel *):not(.bvi-panel),
+body.bvi-images-grayscale video:not(.bvi-panel *):not(.bvi-panel),
+body.bvi-images-grayscale picture:not(.bvi-panel *):not(.bvi-panel) {
+  filter: grayscale(100%) !important;
+}
+
+/* Скрытые изображения: display none */
+body.bvi-images-hidden img:not(.bvi-panel *):not(.bvi-panel),
+body.bvi-images-hidden svg:not(.bvi-panel *):not(.bvi-panel),
+body.bvi-images-hidden video:not(.bvi-panel *):not(.bvi-panel),
+body.bvi-images-hidden picture:not(.bvi-panel *):not(.bvi-panel),
+body.bvi-images-hidden figure:not(.bvi-panel *):not(.bvi-panel) {
+  display: none !important;
+}
+
+/* ============================================
+   РАЗМЕР ШРИФТА (Font Size)
+   ============================================ */
+
+/* Базовый размер шрифта для body - динамически устанавливается через inline-стиль в app.vue */
+/* Принудительно наследуем размер шрифта для всех элементов при включенном BVI */
+body[class*='bvi-'] *:not(.bvi-panel *):not(.bvi-panel) {
+  font-size: inherit !important;
+}
+
+/* ============================================
+   ДОПОЛНИТЕЛЬНЫЕ УЛУЧШЕНИЯ ДОСТУПНОСТИ
+   ============================================ */
+
+/* Улучшение фокуса для интерактивных элементов */
+body[class*='bvi-'] a:not(.bvi-panel *):not(.bvi-panel):focus,
+body[class*='bvi-'] button:not(.bvi-panel *):not(.bvi-panel):focus,
+body[class*='bvi-'] input:not(.bvi-panel *):not(.bvi-panel):focus,
+body[class*='bvi-'] textarea:not(.bvi-panel *):not(.bvi-panel):focus,
+body[class*='bvi-'] select:not(.bvi-panel *):not(.bvi-panel):focus {
+  outline: 3px solid #000000 !important;
+  outline-offset: 2px !important;
+}
+
+/* Улучшение контраста для ссылок */
+body[class*='bvi-'] a:not(.bvi-panel *):not(.bvi-panel) {
+  text-decoration: underline !important;
+  text-decoration-thickness: 2px !important;
+}
+
+/* Улучшение читаемости заголовков */
+body[class*='bvi-'] h1:not(.bvi-panel *):not(.bvi-panel),
+body[class*='bvi-'] h2:not(.bvi-panel *):not(.bvi-panel),
+body[class*='bvi-'] h3:not(.bvi-panel *):not(.bvi-panel),
+body[class*='bvi-'] h4:not(.bvi-panel *):not(.bvi-panel),
+body[class*='bvi-'] h5:not(.bvi-panel *):not(.bvi-panel),
+body[class*='bvi-'] h6:not(.bvi-panel *):not(.bvi-panel) {
+  font-weight: 700 !important;
+  margin-top: 1.5em !important;
+  margin-bottom: 0.75em !important;
+}
+
+/* Улучшение читаемости параграфов */
+body[class*='bvi-'] p:not(.bvi-panel *):not(.bvi-panel) {
+  margin-bottom: 1em !important;
+}
+
+/* Улучшение читаемости списков */
+body[class*='bvi-'] ul:not(.bvi-panel *):not(.bvi-panel),
+body[class*='bvi-'] ol:not(.bvi-panel *):not(.bvi-panel) {
+  margin-bottom: 1em !important;
+  padding-left: 2em !important;
+}
+
+body[class*='bvi-'] li:not(.bvi-panel *):not(.bvi-panel) {
+  margin-bottom: 0.5em !important;
+}

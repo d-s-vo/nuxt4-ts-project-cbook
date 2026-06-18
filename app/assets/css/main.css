@@ -1,6 +1,9 @@
 @import "tailwindcss"; 
 @import "@nuxt/ui";
 
+/* Импорт стилей для панели слабовидящих (BVI Panel) */
+@import "./bvi.css";
+
 @theme {
   --font-playfair: 'Playfair Display', serif;
   --font-dancing: 'Dancing Script', cursive;

@@ -6,7 +6,7 @@ export default defineNuxtConfig({
     compatibilityVersion: 4,
   },
   typescript: {
-    typeCheck: false
+    typeCheck: true
   },
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
@@ -32,5 +32,8 @@ export default defineNuxtConfig({
   modules: ['@nuxt/ui', '@nuxtjs/device'],
   app: {
     pageTransition: { name: 'page', mode: 'out-in' }
-  }
+  },
+  plugins: [
+    '~/plugins/bvi-speech-tracker.client.ts'
+  ]
 })
