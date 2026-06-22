@@ -7,6 +7,8 @@ export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
+    // Добавляем команду запуска сидера:
+    seed: "node --import tsx/esm prisma/seed.ts",
   },
   datasource: {
     url: process.env["DATABASE_URL"],

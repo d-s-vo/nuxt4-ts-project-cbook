@@ -1,7 +1,8 @@
 <template>
-    <div class="max-w-[800px] w-full mx-auto">
+    <div class="max-w-[800px] w-full mx-auto relative pb-[60px]">
         <div
             class="flex items-center justify-between gap-[20px] bg-[#f0f0f0] dark:bg-[#333] p-[20px]"
+            :class="{ 'sticky top-[110px]': isEnabled }"
         >
             <h1 class="des:text-[36px] mob:text-[14px] font-bold underline font-dancing leading-[1.3]">
                 Recipes:
@@ -44,6 +45,8 @@ import { useColorMode } from "@vueuse/core";
 
 const { getAllRecipes } = useRecipes();
 const { data: recipes, pending } = await getAllRecipes();
+
+const { isEnabled } = useBvi();
 
 const searchQuery = ref('');
 

@@ -1,6 +1,6 @@
 // server/api/recipes/[id].delete.ts
 import { defineEventHandler, createError, getRouterParam } from 'h3'
-import { prisma } from '~~/server/utils/prisma'
+import { prisma } from '../../utils/prisma'
 import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3'
 
 // 1. Инициализируем клиент S3 точно так же, как при загрузке

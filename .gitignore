@@ -30,7 +30,7 @@ node_modules
 pnpm-lock.yaml
 
 # Prisma
-/app/generated/prisma
+/prisma/generated
 
 # MinIO data
 minio_data/

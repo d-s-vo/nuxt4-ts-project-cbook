@@ -1,5 +1,5 @@
 import { defineEventHandler, createError, getRouterParam } from 'h3'
-import { prisma } from '~~/server/utils/prisma' // Наш настроенный клиент БД
+import { prisma } from '../../utils/prisma' // Наш настроенный клиент БД
 
 export default defineEventHandler(async (event) => {
   // Вытаскиваем ID из URL (например, запрос на /api/recipes/5 даст нам id = 5)

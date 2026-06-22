@@ -86,7 +86,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { useRecipes } from '~~/app/composables/useRecipes'
+import { useRecipes } from '~/composables/useRecipes'
+import type { Recipe } from '../../shared/types/recipe.types'
 
 const route = useRoute()
 const { getRecipeById, deleteRecipe } = useRecipes()
@@ -95,7 +96,7 @@ const { getRecipeById, deleteRecipe } = useRecipes()
 const recipeId = computed(() => Number(route.query.id))
 
 // Вся логика onMounted, watch и loading заменяется одним хуком useAsyncData!
-const { data: recipe, pending: loading } = await useAsyncData(
+const { data: recipe, pending: loading } = await useAsyncData<Recipe | null>(
   `recipe-${recipeId.value}`, // уникальный ключ для кэша
   () => getRecipeById(recipeId.value),
   {
