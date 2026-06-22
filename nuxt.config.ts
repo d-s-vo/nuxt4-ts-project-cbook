@@ -10,8 +10,12 @@ export default defineNuxtConfig({
   },
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
-  alias: {
-    '#prisma': './prisma/generated/client'
+  nitro: {
+    typescript: {
+      tsConfig: {
+        include: ['../prisma/generated/client/**/*']
+      }
+    }
   },
   vite: {
     server: {

@@ -1,4 +1,4 @@
-import { PrismaClient } from '#prisma'
+import { PrismaClient } from '../../prisma/generated/client/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 
 // Мы создаем единственный экземпляр клиента, 
