@@ -9,7 +9,7 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare && prisma generate",
+    "postinstall": "nuxt prepare",
     "typecheck": "nuxt typecheck",
     "studio": "prisma studio",
     "test:e2e": "tsx ./scripts/run-e2e.ts",
