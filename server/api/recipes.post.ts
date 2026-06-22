@@ -1,7 +1,7 @@
 // server/api/recipes.post.ts
 import { defineEventHandler, createError, readMultipartFormData } from 'h3'
 import { prisma } from '../utils/prisma'
-import { Difficulty } from '../../prisma/generated/client'
+import { Difficulty } from '#prisma'
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 
 // 1. НАСТРОЙКА КЛИЕНТА S3
