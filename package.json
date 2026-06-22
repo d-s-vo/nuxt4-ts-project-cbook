@@ -15,7 +15,7 @@
     "test:e2e": "tsx ./scripts/run-e2e.ts",
     "test:env:down": "docker compose -f docker-compose.test.yml down"
   },
-  "packageManager": "pnpm@9.15.0",
+  "packageManager": "pnpm@10.12.1",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1053.0",
     "@nuxt/ui": "^4.1.0",
