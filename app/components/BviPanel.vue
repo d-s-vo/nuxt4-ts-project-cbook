@@ -17,8 +17,9 @@
               :aria-label="fontSize <= 16 ? 'Размер шрифта минимальный' : 'Уменьшить размер шрифта'"
               :aria-pressed="false"
               class="
-                 text-black font-medium 
-                hover:bg-[#F5F5F5] disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 
+                text-black font-medium
+                enabled:hover:bg-black enabled:hover:text-white 
+                disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 
                 focus:ring-black focus:outline-none transition-colors"
             >
               А-
@@ -30,8 +31,8 @@
               :aria-label="fontSize >= 32 ? 'Размер шрифта максимальный' : 'Увеличить размер шрифта'"
               :aria-pressed="false"
               class="
-                
-                text-black font-medium text-sm hover:bg-[#F5F5F5]
+                text-black font-medium text-sm 
+                enabled:hover:bg-black enabled:hover:text-white
                 disabled:opacity-50 disabled:cursor-not-allowed 
                 focus:ring-2 focus:ring-black focus:outline-none transition-colors
               "
@@ -51,7 +52,11 @@
               :aria-pressed="theme === 'white-black'"
               :aria-label="theme === 'white-black' ? 'Тема черный текст на белом фоне выбрана' : 'Черный текст на белом фоне'"
               :class="theme === 'white-black' ? 'bg-white text-black border-black' : 'bg-white border-gray-300 text-black hover:bg-gray-50'"
-              class="ium text-sm focus:ring-2 focus:ring-black focus:outline-none transition-colors"
+              class="
+                ium text-sm 
+                enabled:hover:bg-black enabled:hover:text-white
+                focus:ring-2 focus:ring-black focus:outline-none transition-colors
+              "
             >
               Ч/Б
             </button>
@@ -60,7 +65,11 @@
               :aria-pressed="theme === 'black-white'"
               :aria-label="theme === 'black-white' ? 'Тема белый текст на черном фоне выбрана' : 'Белый текст на черном фоне'"
               :class="theme === 'black-white' ? 'bg-black text-white border-black' : 'bg-white border-gray-300 text-black hover:bg-gray-50'"
-              class="ium text-sm focus:ring-2 focus:ring-black focus:outline-none transition-colors"
+              class="
+                ium text-sm 
+                enabled:hover:bg-black enabled:hover:text-white
+                focus:ring-2 focus:ring-black focus:outline-none transition-colors
+              "
             >
               Б/Ч
             </button>
@@ -69,7 +78,11 @@
               :aria-pressed="theme === 'blue'"
               :aria-label="theme === 'blue' ? 'Синяя тема выбрана' : 'Синяя тема'"
               :class="theme === 'blue' ? 'bg-[#dbeafe] text-[#1e3a8a] border-[#1e3a8a]' : 'bg-white border-gray-300 text-black hover:bg-gray-50'"
-              class="ium text-sm focus:ring-2 focus:ring-black focus:outline-none transition-colors"
+              class="
+                ium text-sm 
+                enabled:hover:bg-[#dbeafe] enabled:hover:text-[#1e3a8a]
+                focus:ring-2 focus:ring-black focus:outline-none transition-colors
+              "
             >
               Син
             </button>
@@ -85,7 +98,11 @@
               :aria-pressed="spacing === 'normal'"
               :aria-label="spacing === 'normal' ? 'Стандартные интервалы выбраны' : 'Стандартные интервалы'"
               :class="spacing === 'normal' ? 'shadow-[0_0_0_2px_rgba(0,0,0)]' : ''"
-              class="ium text-sm focus:ring-2 focus:ring-black focus:outline-none transition-colors"
+              class="
+                ium text-sm 
+                focus:ring-2 focus:ring-black focus:outline-none transition-colors 
+                enabled:hover:bg-black enabled:hover:text-white
+              "
             >
               Стандарт
             </button>
@@ -94,7 +111,11 @@
               :aria-pressed="spacing === 'medium'"
               :aria-label="spacing === 'medium' ? 'Средние интервалы выбраны' : 'Средние интервалы'"
               :class="spacing === 'medium' ? 'shadow-[0_0_0_2px_rgba(0,0,0)]' : ''"
-              class="leading-[1.5] tracking-[0.12em] [word-spacing:0.1em] focus:ring-2 focus:ring-black focus:outline-none transition-colors"
+              class="
+                leading-[1.5] tracking-[0.12em] [word-spacing:0.1em] 
+                focus:ring-2 focus:ring-black focus:outline-none transition-colors 
+                enabled:hover:bg-black enabled:hover:text-white
+              "
             >
               Средний
             </button>
@@ -107,6 +128,7 @@
                 ium text-sm
                 leading-[2] tracking-[0.2em] [word-spacing:0.15em]
                 focus:ring-2 focus:ring-black focus:outline-none transition-colors
+                enabled:hover:bg-black enabled:hover:text-white
               "
             >
               Большой
@@ -122,8 +144,12 @@
               @click="setImageMode('default')"
               :aria-pressed="imageMode === 'default'"
               :aria-label="imageMode === 'default' ? 'Цветные изображения выбраны' : 'Цветные изображения'"
-              :class="imageMode === 'default' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white border-gray-300 text-black hover:bg-gray-50'"
-              class="ium text-sm focus:ring-2 focus:ring-black focus:outline-none transition-colors"
+              :class="imageMode === 'default' ? 'bg-black text-white border-blue-600' : ''"
+              class="
+                ium text-sm 
+                focus:ring-2 focus:ring-black focus:outline-none transition-colors 
+                enabled:hover:bg-black enabled:hover:text-white
+              "
             >
               Цветные
             </button>
@@ -131,8 +157,12 @@
               @click="setImageMode('grayscale')"
               :aria-pressed="imageMode === 'grayscale'"
               :aria-label="imageMode === 'grayscale' ? 'Черно-белые изображения выбраны' : 'Черно-белые изображения'"
-              :class="imageMode === 'grayscale' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white border-gray-300 text-black hover:bg-gray-50'"
-              class="ium text-sm focus:ring-2 focus:ring-black focus:outline-none transition-colors"
+              :class="imageMode === 'grayscale' ? 'bg-black text-white border-blue-600' : ''"
+              class="
+                ium text-sm 
+                focus:ring-2 focus:ring-black focus:outline-none transition-colors
+                enabled:hover:bg-black enabled:hover:text-white
+              "
             >
               Ч/Б
             </button>
@@ -140,8 +170,12 @@
               @click="setImageMode('hidden')"
               :aria-pressed="imageMode === 'hidden'"
               :aria-label="imageMode === 'hidden' ? 'Изображения отключены' : 'Отключить изображения'"
-              :class="imageMode === 'hidden' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white border-gray-300 text-black hover:bg-gray-50'"
-              class="ium text-sm focus:ring-2 focus:ring-black focus:outline-none transition-colors"
+              :class="imageMode === 'hidden' ? 'bg-black text-white border-blue-600' : ''"
+              class="
+                ium text-sm 
+                focus:ring-2 focus:ring-black focus:outline-none transition-colors
+                enabled:hover:bg-black enabled:hover:text-white
+              "
             >
               Отключить
             </button>
@@ -156,8 +190,8 @@
               :aria-pressed="speechEnabled"
               :aria-label="speechEnabled ? 'Озвучка текста включена' : 'Озвучка текста выключена'"
               :class="[
-                'ium text-sm focus:ring-2 focus:ring-black focus:outline-none transition-colors flex items-center gap-2',
-                speechEnabled ? 'bg-blue-600 text-white border-blue-600' : 'bg-white border-gray-300 text-black hover:bg-gray-50'
+                'ium text-sm flex items-center justify-center focus:ring-2 focus:ring-black focus:outline-none transition-colors min-w-[209px] hover:bg-black hover:text-white',
+                speechEnabled ? 'bg-black text-white border-black' : ''
               ]"
             >
               {{ speechEnabled ? 'Озвучка текста включена' : 'Озвучка текста выключена' }}
@@ -166,7 +200,10 @@
             <button
               @click="toggleBvi"
               aria-label="Обычная версия сайта"
-              class="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white border border-red-600 font-medium text-sm focus:ring-2 focus:ring-black focus:outline-none transition-colors"
+              class="
+                bg-red-500 hover:bg-red-900 text-white border border-red-600 font-medium text-sm 
+                focus:ring-2 focus:ring-black focus:outline-none transition-colors
+              "
             >
               Обычная версия
             </button>
@@ -228,30 +265,5 @@ const {
   border-radius: 6px;
   height: 30px;
   padding: 0 12px;
-}
-
-.bvi-panel button.bg-black {
-  background-color: black !important;
-  color: white !important;
-}
-
-.bvi-panel button.bg-green-600 {
-  background-color: rgb(22, 163, 74) !important;
-  color: white !important;
-}
-
-.bvi-panel button.bg-red-600 {
-  background-color: rgb(220, 38, 38) !important;
-  color: white !important;
-}
-
-.bvi-panel button.bg-blue-900 {
-  background-color: rgb(30, 58, 138) !important;
-  color: white !important;
-}
-
-.bvi-panel button:disabled {
-  opacity: 0.5 !important;
-  cursor: not-allowed !important;
 }
 </style>
