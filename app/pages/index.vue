@@ -42,27 +42,7 @@
 import { ref, computed } from "vue";
 import type { Recipe } from '~~/shared/types/recipe.types';
 import { useColorMode } from "@vueuse/core";
-
 const config = useRuntimeConfig()
-
-useSeoMeta({
-  titleTemplate: '%s | CBook — Кулинарная книга',
-  title: 'Главная',
-  description: 'Проверенные пошаговые рецепты',
-
-  ogType: 'website',
-  ogSiteName: 'CBook',
-  ogTitle: 'CBook — Современная кулинарная книга',
-  ogDescription: 'Проверенные пошаговые рецепты',
-  ogImage: `${config.public.siteUrl}/images/og-default.jpg`,
-  ogUrl: config.public.siteUrl,
-  ogLocale: 'ru_RU',
-
-  twitterCard: 'summary_large_image',
-  twitterTitle: 'CBook — Современная кулинарная книга',
-  twitterDescription: 'Проверенные пошаговые рецепты',
-  twitterImage: `${config.public.siteUrl}/images/og-default.jpg`,
-})
 
 const { getAllRecipes } = useRecipes();
 const { data: recipes, pending } = await getAllRecipes();
@@ -70,6 +50,25 @@ const { data: recipes, pending } = await getAllRecipes();
 const { isEnabled } = useBvi();
 
 const searchQuery = ref('');
+
+useSeoMeta({
+  titleTemplate: '%s | CBook — Кулинарная книга',
+  title: () => 'Главная',
+  description: () => 'Проверенные пошаговые рецепты с расчетом КБЖУ',
+
+  ogType: 'website',
+  ogSiteName: 'CBook',
+  ogTitle: () => 'CBook — Современная кулинарная книга',
+  ogDescription: () => 'Проверенные пошаговые рецепты с расчетом КБЖУ',
+  ogImage: () => `${config.public.siteUrl}/images/og-default.jpg`,
+  ogUrl: () => config.public.siteUrl,
+  ogLocale: 'ru_RU',
+
+  twitterCard: 'summary_large_image',
+  twitterTitle: () => 'CBook — Современная кулинарная книга',
+  twitterDescription: () => 'Проверенные пошаговые рецепты с расчетом КБЖУ',
+  twitterImage: () => `${config.public.siteUrl}/images/og-default.jpg`,
+});
 
 const filteredRecipes = computed<Recipe[]>(() => {
     const query = searchQuery.value.trim().toLowerCase();
