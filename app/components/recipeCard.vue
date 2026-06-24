@@ -14,7 +14,7 @@
                     :alt="recipe.title"
                     class="rounded-[10px] w-full h-full object-cover"
                 >
-                <img v-else src="/public/images/placeholder.png" alt="Placeholder" class="rounded-[10px] w-full h-full object-cover">
+                <img v-else src="/images/placeholder.png" alt="Placeholder" class="rounded-[10px] w-full h-full object-cover">
             </div>
             <div>
                 <h2
