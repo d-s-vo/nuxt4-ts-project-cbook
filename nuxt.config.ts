@@ -2,6 +2,11 @@ import { defineNuxtConfig } from 'nuxt/config'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  runtimeConfig: {
+    public: {
+      siteUrl: 'https://nuxt4-ts-project-cbook-b57b.vercel.app',
+    }
+  },
   future: {
     compatibilityVersion: 4,
   },

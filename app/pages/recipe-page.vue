@@ -89,7 +89,8 @@ import { useRoute } from 'vue-router'
 import { useRecipes } from '~/composables/useRecipes'
 import type { Recipe } from '../../shared/types/recipe.types'
 
-const route = useRoute()
+const route = useRoute();
+const config = useRuntimeConfig();
 const { getRecipeById, deleteRecipe } = useRecipes()
 
 // Делаем ID реактивным, чтобы Nuxt знал, когда он меняется
@@ -119,5 +120,26 @@ const handleDelete = async () => {
   } catch (error) {
     console.error('Ошибка при удалении рецепта:', error)
   }
-}
+};
+
+useSeoMeta({
+  title: () => recipe.value?.title || 'Рецепт не найден',
+  description: () => recipe.value?.description || 'Описание отсутствует',
+
+  // OG Статья
+  ogType: 'article',
+  ogTitle: () => recipe.value ? `${recipe.value.title} — Рецепт` : 'CBook',
+  ogDescription: () => recipe.value?.description,
+  
+  // Если в БД есть ссылка на MinIO — берем её, если null — отдаем дефолтную картинку
+  ogImage: () => recipe.value?.imageUrl || `${config.public.siteUrl}/images/og-default.jpg`,
+  ogUrl: () => `${config.public.siteUrl}/recipe-page?id=${recipeId.value}`,
+
+  articleSection: () => recipe.value?.difficulty || 'Рецепты',
+
+  // Twitter
+  twitterCard: 'summary_large_image',
+  twitterTitle: () => recipe.value?.title,
+  twitterImage: () => recipe.value?.imageUrl || `${config.public.siteUrl}/images/og-default.jpg`,
+})
 </script>

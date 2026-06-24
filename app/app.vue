@@ -26,6 +26,30 @@
 <script setup lang="ts">
 const { isMobileOrTablet } = useDevice();
 
+const config = useRuntimeConfig()
+
+useSeoMeta({
+  // Базовое SEO
+  titleTemplate: '%s | CBook — Кулинарная книга',
+  title: 'Главная',
+  description: 'Проверенные пошаговые рецепты с точным расчетом КБЖУ и времени приготовления.',
+
+  // OpenGraph (VK, Telegram, WhatsApp)
+  ogType: 'website',
+  ogSiteName: 'CBook',
+  ogTitle: 'CBook — Современная кулинарная книга',
+  ogDescription: 'Проверенные пошаговые рецепты с точным расчетом КБЖУ и времени приготовления.',
+  ogImage: `${config.public.siteUrl}/images/og-default.jpg`,
+  ogUrl: config.public.siteUrl,
+  ogLocale: 'ru_RU',
+
+  // Twitter / X (отвечает за широкие превью в мессенджерах)
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'CBook — Современная кулинарная книга',
+  twitterDescription: 'Проверенные пошаговые рецепты с точным расчетом КБЖУ.',
+  twitterImage: `${config.public.siteUrl}/images/og-default.jpg`,
+})
+
 // Получаем состояние BVI из composable
 const { isEnabled, fontSize, theme, spacing, imageMode, toggleBvi } = useBvi()
 
