@@ -39,7 +39,7 @@ useSeoMeta({
   ogSiteName: 'CBook',
   ogTitle: 'CBook — Современная кулинарная книга',
   ogDescription: 'Проверенные пошаговые рецепты',
-  ogImage: `${config.public.siteUrl}/images/og-default.jpg`,
+  ogImage: `${config.public.siteUrl}/og-default.jpg`,
   ogUrl: config.public.siteUrl,
   ogLocale: 'ru_RU',
 
@@ -47,7 +47,7 @@ useSeoMeta({
   twitterCard: 'summary_large_image',
   twitterTitle: 'CBook — Современная кулинарная книга',
   twitterDescription: 'Проверенные пошаговые рецепты',
-  twitterImage: `${config.public.siteUrl}/images/og-default.jpg`,
+  twitterImage: `${config.public.siteUrl}/og-default.jpg`,
 })
 
 // Получаем состояние BVI из composable
