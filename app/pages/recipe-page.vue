@@ -131,15 +131,16 @@ useSeoMeta({
   ogTitle: () => recipe.value ? `${recipe.value.title} — Рецепт` : 'CBook',
   ogDescription: () => recipe.value?.description,
   
-  // Если в БД есть ссылка на MinIO — берем её, если null — отдаем дефолтную картинку
-  ogImage: () => recipe.value?.imageUrl || `${config.public.siteUrl}/images/og-default.jpg`,
+  // Забираем абсолютную ссылку на файл из папки проекта
+  ogImage: `${config.public.siteUrl}/images/og-default.jpg`,
   ogUrl: () => `${config.public.siteUrl}/recipe-page?id=${recipeId.value}`,
 
   articleSection: () => recipe.value?.difficulty || 'Рецепты',
 
-  // Twitter
+  // Twitter / X слой
   twitterCard: 'summary_large_image',
   twitterTitle: () => recipe.value?.title,
-  twitterImage: () => recipe.value?.imageUrl || `${config.public.siteUrl}/images/og-default.jpg`,
+  twitterDescription: () => recipe.value?.description, // <-- Убивает баг с чужим описанием
+  twitterImage: `${config.public.siteUrl}/images/og-default.jpg`,
 })
 </script>
