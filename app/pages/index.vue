@@ -42,12 +42,10 @@
 import { ref, computed } from "vue";
 import type { Recipe } from '~~/shared/types/recipe.types';
 import { useColorMode } from "@vueuse/core";
-const config = useRuntimeConfig()
+const config = useRuntimeConfig();
+const { isEnabled } = useBvi();
 
 const { getAllRecipes } = useRecipes();
-const { data: recipes, pending } = await getAllRecipes();
-
-const { isEnabled } = useBvi();
 
 const searchQuery = ref('');
 
@@ -70,6 +68,13 @@ useSeoMeta({
   twitterImage: () => `${config.public.siteUrl}/images/og-default.jpg`,
 });
 
+const colorMode = useColorMode();
+const toggleTheme = () => {
+  colorMode.value = colorMode.value === 'dark' ? 'light' : 'dark'
+}
+
+const { data: recipes, pending } = await getAllRecipes();
+
 const filteredRecipes = computed<Recipe[]>(() => {
     const query = searchQuery.value.trim().toLowerCase();
     
@@ -86,9 +91,4 @@ const filteredRecipes = computed<Recipe[]>(() => {
     // Явно указываем (r: Recipe)
     return recipes.value.filter((r: Recipe) => r.title.toLowerCase().includes(query));
 });
-
-const colorMode = useColorMode();
-const toggleTheme = () => {
-  colorMode.value = colorMode.value === 'dark' ? 'light' : 'dark'
-}
 </script>
