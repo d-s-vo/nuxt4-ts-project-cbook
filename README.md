@@ -1,138 +1,82 @@
 # 🍽️ Cookbook
 
-> Современное, отказоустойчивое веб-приложение для хранения и поиска кулинарных рецептов. 
+> Веб-приложение для хранения, просмотра и поиска кулинарных рецептов.
 
-Проект построен на базе Nuxt 4 с полноценным бэкендом (API Routes), реляционной базой данных и интеграцией с S3-совместимым облачным хранилищем для изображений. Настроен непрерывный цикл интеграции (CI/CD) и сквозное E2E-тестирование.
+Пользователь просматривает каталог рецептов, открывает отдельный рецепт, добавляет новый
+(с загрузкой изображения) и удаляет. Есть панель доступности для слабовидящих.
 
-## 🛠 Технический стек
+> ⚠️ **Статус: идёт миграция стека.** Проект переводится с прежней версии на Nuxt/Prisma
+> на стек Laravel. Инструкции ниже описывают **целевой** стек; часть шагов станет актуальной
+> по мере переноса кода.
 
-* **Фреймворк:** [Nuxt 4](https://nuxt.com/) / Vue 3
-* **Язык:** [TypeScript](https://www.typescriptlang.org/)
-* **Стили и UI:** [Tailwind CSS](https://tailwindcss.com/)
-* **База данных:** PostgreSQL + [Prisma ORM](https://www.prisma.io/)
-* **Хранилище файлов:** MinIO (AWS S3 SDK)
-* **Тестирование:** [Playwright](https://playwright.dev/) (E2E)
-* **Инфраструктура:** Docker, GitHub Actions
+## 🛠 Технический стек (целевой)
 
----
+* **Бэкенд:** PHP 8.4 · Laravel 12 · MySQL 8
+* **Фронтенд:** Inertia.js · Vue 3 (`<script setup>`, TypeScript strict) · Tailwind CSS
+* **Слой данных:** Spatie Laravel Data (типизированные DTO) + автогенерация TS-типов
+* **Админ-панель:** Filament 5
+* **Медиа:** `whyme-agency/laravel-media` (загрузка и обработка изображений)
+* **Качество:** PHPStan (Level 10) · Laravel Pint (PSR-12) · Pest (тесты)
+* **Локальное окружение:** Laravel Sail (Docker)
 
-## 📋 Предварительные требования
-
-Для комфортного запуска проекта локально потребуются:
-
-* **Node.js 20+** (Рекомендуемая версия: 20.19.5 LTS)
-* **pnpm 9+** (Менеджер пакетов: `npm install -g pnpm@9`)
-* **Docker & Docker Compose** (Для локального запуска базы данных и S3 хранилища)
-
----
-
-## 🚀 Локальная установка и запуск
-
-**1. Клонирование и установка зависимостей**
+## 🚀 Локальный запуск (Sail)
 
 ```bash
-git clone [https://github.com/d-s-vo/nuxt4-ts-project-cbook](https://github.com/d-s-vo/nuxt4-ts-project-cbook)
-cd nuxt4-ts-project-cbook
-pnpm install
+# 1. зависимости
+composer install
+cp .env.example .env
+
+# 2. окружение в Docker (MySQL, Redis, Mailpit)
+./vendor/bin/sail up -d
+./vendor/bin/sail artisan key:generate
+
+# 3. схема БД
+./vendor/bin/sail artisan migrate
+
+# 4. фронтенд
+npm install
+npm run dev
 ```
 
-**2. Настройка переменных окружения**
+Приложение — на локальном порту Sail (`APP_PORT`), Vite — на `:5173`, админка Filament — по `/admin`.
 
-Создайте файлы .env и .env.test в корне проекта.
-
-⚠️ Важно: Для связи между Node.js и Docker-контейнерами используйте 127.0.0.1 вместо localhost, чтобы избежать конфликтов маршрутизации IPv6/IPv4 в современных системах.
-
-Пример локального .env:
+## 💻 Основные команды
 
 ```bash
-   # База данных
-   DATABASE_URL="postgresql://local_user:local_password@127.0.0.1:5432/recipes_db?schema=public"
+./vendor/bin/sail up -d                    # поднять окружение
+./vendor/bin/sail artisan migrate          # применить миграции
+npm run dev                                # Vite dev-сервер
+npm run build                              # прод-сборка фронтенда
 
-   # MinIO (S3 Хранилище)
-   S3_ENDPOINT="[http://127.0.0.1:9000](http://127.0.0.1:9000)"
-   S3_ACCESS_KEY="local_access_key"
-   S3_SECRET_KEY="local_secret_key_123"
-   S3_BUCKET="recipes"
-   S3_REGION="us-east-1"
+./vendor/bin/sail artisan test             # тесты (Pest)
+./vendor/bin/sail bin pint --test          # стиль кода (PSR-12)
+./vendor/bin/sail bin phpstan analyse      # статический анализ (Level 10)
+./vendor/bin/sail artisan typescript:transform   # генерация TS-типов из DTO
 ```
 
-**3. Запуск инфраструктуры (Docker)**
+## 🏛 Архитектура (слоистая)
 
-Поднимите локальную базу данных Postgres и хранилище MinIO:
+Строгий однонаправленный поток данных:
 
-```bash
-docker compose up -d
+```
+Request (FormRequest) → Controller → Task → Repository → DTO (Spatie Data) → Page Resolver → Inertia (Vue)
 ```
 
-**4. Инициализация базы данных**
-Примените миграции Prisma, чтобы создать таблицы:
+| Слой | Каталог | Ответственность |
+|------|---------|-----------------|
+| Модели | `app/Models` | Eloquent-сущности (доступ к БД — только через Repository) |
+| Репозитории | `app/Data/Repositories` | единственное место запросов к БД (Eloquent / `DB`) |
+| DTO | `app/Data` | типизированные объекты передачи данных (Spatie Data) |
+| Задачи | `app/Tasks` | одна бизнес-операция = один Task |
+| Резолверы | `app/Resolvers/Page` | сборка пропсов страницы для Inertia |
+| Админка | `app/Filament` | ресурсы Filament (без бизнес-логики) |
+| Фронтенд | `resources/js` | Inertia-страницы и Vue-компоненты (получают только DTO) |
 
-```bash
-pnpm prisma migrate dev
-```
+**Правила:** каждый `.php` — `declare(strict_types=1)`; наружу (в Inertia/Vue) отдаются только
+DTO, не сырые модели; вся серверная валидация — через Form Requests.
 
-**5. Запуск сервера разработки**
+## 📦 Доменная модель
 
-```bash
-pnpm dev
-```
-
-Фронтенд приложения доступен по адресу: http://localhost:3000
-
-Консоль хранилища MinIO доступна по адресу: http://127.0.0.1:9001
-
-## 💻 Основные команды (Скрипты)
-### Разработка и сборка
-
-```bash
-pnpm dev — Запуск в режиме разработки.
-```
-
-```bash
-pnpm build — Сборка приложения для продакшена.
-```
-
-```bash
-pnpm preview — Локальный запуск собранной версии.
-```
-
-```bash
-pnpm typecheck — Строгая проверка типов TypeScript.
-```
-
-```bash
-pnpm lint — Проверка кода линтером.
-```
-
-База данных (Prisma):
-
-```bash
-pnpm prisma studio — Запуск удобного веб-интерфейса для просмотра и редактирования записей в БД.
-```
-
-```bash
-pnpm prisma migrate dev — Создание и применение новых миграций после изменения схемы в schema.prisma.
-```
-
-Тестирование (Playwright):
-
-```bash
-pnpm run test:e2e — Полный цикл сквозного тестирования (автоматически поднимает тестовые контейнеры, накатывает миграции, запускает тесты и очищает среду).
-```
-
-```bash
-pnpm run test:e2e:ui — Запуск E2E тестов с визуальным UI-интерфейсом для отладки и просмотра шагов.
-```
-
-## 📁 Структура проекта
-Plaintext
-├── app/                      # Фронтенд: главный файл app.vue, страницы и компоненты
-├── server/                   # Бэкенд: API эндпоинты (/api/*), логика Prisma и S3
-├── prisma/                   # Схема базы данных (schema.prisma) и миграции
-├── tests/e2e/                # Сценарии сквозного тестирования Playwright
-├── scripts/                  # Вспомогательные скрипты (оркестратор run-e2e.ts)
-├── .github/workflows/        # Конфигурации CI/CD конвейеров для GitHub Actions
-├── docker-compose.yml        # Инфраструктура для локальной разработки (БД + MinIO)
-├── docker-compose.test.yml   # Изолированная инфраструктура для E2E-тестов
-├── playwright.config.ts      # Конфигурация тестового робота и его окружения
-└── nuxt.config.ts            # Главный конфигурационный файл Nuxt 4
+* **Recipe** — `title`, `description`, `cooking_time`, `servings`, `difficulty` (low/medium/high),
+  `steps` (JSON-массив шагов).
+* **Ingredient** — `name`, `quantity`, `unit`; связь `hasMany` c `Recipe` (каскадное удаление).
