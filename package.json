@@ -1,55 +1,17 @@
 {
-  "name": "vue-ts-cbook",
-  "version": "1.0.0",
-  "type": "module",
-  "private": true,
-  "description": "Modern Vue.js boilerplate with Nuxt 4, TypeScript, Tailwind CSS, and Nuxt UI 4",
-  "scripts": {
-    "build": "prisma generate && nuxt build",
-    "dev": "nuxt dev",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
-    "typecheck": "nuxt typecheck",
-    "studio": "prisma studio",
-    "test:e2e": "tsx ./scripts/run-e2e.ts",
-    "test:env:down": "docker compose -f docker-compose.test.yml down"
-  },
-  "packageManager": "pnpm@10.12.1",
-  "dependencies": {
-    "@aws-sdk/client-s3": "^3.1053.0",
-    "@nuxt/ui": "^4.1.0",
-    "@prisma/adapter-pg": "^7.8.0",
-    "@prisma/client": "^7.8.0",
-    "@vueuse/core": "^13.9.0",
-    "@vueuse/nuxt": "^13.9.0",
-    "nuxt": "^4.1.1",
-    "pg": "^8.21.0",
-    "vue": "^3.5.21",
-    "vue-router": "^5.0.6",
-    "zod": "^4.1.12"
-  },
-  "devDependencies": {
-    "@nuxtjs/device": "^4.0.0",
-    "@nuxtjs/router": "^1.7.0",
-    "@playwright/test": "^1.60.0",
-    "@types/node": "^24.5.2",
-    "@types/pg": "^8.20.0",
-    "prisma": "^7.8.0",
-    "sass-embedded": "^1.100.0",
-    "tsx": "^4.22.4",
-    "typescript": "^5.9.3",
-    "vitest": "^4.1.8",
-    "vue-tsc": "^2.2.12",
-    "zx": "^8.8.5"
-  },
-  "keywords": [
-    "vue",
-    "nuxt",
-    "typescript",
-    "tailwind",
-    "composition-api"
-  ],
-  "author": "",
-  "license": "MIT"
+    "$schema": "https://www.schemastore.org/package.json",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite"
+    },
+    "devDependencies": {
+        "@tailwindcss/vite": "^4.0.0",
+        "axios": "^1.11.0",
+        "concurrently": "^9.0.1",
+        "laravel-vite-plugin": "^2.0.0",
+        "tailwindcss": "^4.0.0",
+        "vite": "^7.0.7"
+    }
 }
