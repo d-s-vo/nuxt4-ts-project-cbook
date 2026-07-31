@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Data;
 
 use App\Enums\Difficulty;
+use Carbon\CarbonImmutable;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
@@ -26,8 +27,8 @@ final class RecipeData extends Data
         public array $steps,
         #[DataCollectionOf(IngredientData::class)]
         public array $ingredients,
-        public ?string $created_at,
-        public ?string $updated_at,
+        public ?CarbonImmutable $created_at,
+        public ?CarbonImmutable $updated_at,
     ) {
     }
 }

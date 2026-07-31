@@ -52,6 +52,8 @@ it('synchronizes ingredients on update', function () {
         ->has(Ingredient::factory()->count(3))
         ->create();
 
+    $originalIds = $recipe->ingredients()->pluck('id')->all();
+
     expect($recipe->ingredients()->count())->toBe(3);
 
     $this->recipes->update($recipe->id, recipeAttributes(), [
@@ -63,7 +65,11 @@ it('synchronizes ingredients on update', function () {
         ->and($recipe->fresh()->title)->toBe('Pancakes');
 
     $this->assertDatabaseHas('ingredients', ['recipe_id' => $recipe->id, 'name' => 'Sugar']);
-    $this->assertDatabaseMissing('ingredients', ['recipe_id' => $recipe->id, 'name' => 'Salt', 'quantity' => 999]);
+    $this->assertDatabaseHas('ingredients', ['recipe_id' => $recipe->id, 'name' => 'Salt']);
+
+    foreach ($originalIds as $originalId) {
+        $this->assertDatabaseMissing('ingredients', ['id' => $originalId]);
+    }
 });
 
 it('deletes a recipe and cascades to its ingredients', function () {
