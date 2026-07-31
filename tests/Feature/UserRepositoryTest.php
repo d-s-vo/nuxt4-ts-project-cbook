@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 use App\Data\Repositories\UserRepository;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->users = app(UserRepository::class);
