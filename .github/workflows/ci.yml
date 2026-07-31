@@ -108,5 +108,9 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - name: Lint
+        run: pnpm run --if-present lint
+      - name: Typecheck
+        run: pnpm run --if-present typecheck
       - name: Build
         run: pnpm build
