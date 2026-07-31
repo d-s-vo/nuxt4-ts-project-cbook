@@ -40,7 +40,10 @@ it('never leaks password or remember token', function () {
 it('shares a null user for guests on the welcome page', function () {
     $this->get('/')
         ->assertOk()
-        ->assertInertia(fn (AssertableInertia $page) => $page->where('auth.user', null));
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('auth.user', null)
+            ->missing('auth.user.created_at')
+            ->missing('auth.user.updated_at'));
 });
 
 it('shares the user as a dto without sensitive fields when authenticated', function () {
@@ -53,5 +56,7 @@ it('shares the user as a dto without sensitive fields when authenticated', funct
             ->where('auth.user.name', $user->name)
             ->where('auth.user.email', $user->email)
             ->missing('auth.user.password')
-            ->missing('auth.user.remember_token'));
+            ->missing('auth.user.remember_token')
+            ->missing('auth.user.created_at')
+            ->missing('auth.user.updated_at'));
 });
