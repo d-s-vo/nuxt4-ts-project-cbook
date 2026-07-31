@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use Spatie\LaravelTypeScriptTransformer\TypeScriptTransformerApplicationServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -14,7 +15,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // The TypeScript type generator is a dev-only tool: its package is not
+        // installed in production, so only register it when it is available.
+        if (class_exists(TypeScriptTransformerApplicationServiceProvider::class)) {
+            $this->app->register(TypeScriptTransformerServiceProvider::class);
+        }
     }
 
     /**
