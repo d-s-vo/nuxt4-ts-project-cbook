@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\Difficulty;
 use App\Filament\Resources\Recipes\Pages\CreateRecipe;
 use App\Filament\Resources\Recipes\Pages\EditRecipe;
 use App\Filament\Resources\Recipes\Pages\ListRecipes;
@@ -47,6 +48,9 @@ test('creating a recipe through the panel persists it with its ingredients', fun
     $recipe = Recipe::query()->where('title', 'Panel Soup')->firstOrFail();
 
     expect($recipe->user_id)->toBe($author->id);
+    expect($recipe->description)->toBe('Cooked from the admin panel.');
+    expect($recipe->difficulty)->toBe(Difficulty::Medium);
+    expect($recipe->steps)->toBe(['Boil water', 'Add everything']);
     expect($recipe->ingredients()->count())->toBe(2);
     $this->assertDatabaseHas('ingredients', ['recipe_id' => $recipe->id, 'name' => 'Salt']);
     $this->assertDatabaseHas('ingredients', ['recipe_id' => $recipe->id, 'name' => 'Water']);

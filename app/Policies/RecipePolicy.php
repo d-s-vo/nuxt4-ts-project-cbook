@@ -18,7 +18,7 @@ final class RecipePolicy
      * поверх проверки владельца. Для обычных пользователей возвращаем null: решение остаётся
      * за конкретными методами (owner-scoping не ослабляется).
      */
-    public function before(User $user): ?bool
+    public function before(User $user, string $ability): ?bool
     {
         return $user->is_admin ? true : null;
     }
