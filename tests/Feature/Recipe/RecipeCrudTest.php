@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Requests\StoreRecipeRequest;
 use App\Models\Ingredient;
 use App\Models\Recipe;
 use App\Models\User;
@@ -33,9 +34,7 @@ test('authenticated user can create a recipe with ingredients', function () {
         ->actingAs($user)
         ->post('/recipes', validRecipePayload());
 
-    $response
-        ->assertSessionHasNoErrors()
-        ->assertRedirect(route('dashboard'));
+    $response->assertSessionHasNoErrors();
 
     $this->assertDatabaseHas('recipes', [
         'user_id' => $user->id,
@@ -43,6 +42,7 @@ test('authenticated user can create a recipe with ingredients', function () {
     ]);
 
     $recipe = Recipe::query()->where('title', 'Pumpkin Soup')->firstOrFail();
+    $response->assertRedirect(route('recipes.show', $recipe->id));
     $this->assertDatabaseHas('ingredients', ['recipe_id' => $recipe->id, 'name' => 'Pumpkin']);
     $this->assertDatabaseHas('ingredients', ['recipe_id' => $recipe->id, 'name' => 'Cream']);
 });
@@ -63,7 +63,7 @@ test('owner can update their recipe and ingredients are synchronized', function 
 
     $response
         ->assertSessionHasNoErrors()
-        ->assertRedirect(route('dashboard'));
+        ->assertRedirect(route('recipes.show', $recipe->id));
 
     $this->assertDatabaseHas('recipes', ['id' => $recipe->id, 'title' => 'Updated Soup']);
     $this->assertDatabaseHas('ingredients', ['recipe_id' => $recipe->id, 'name' => 'Carrot']);
@@ -79,7 +79,7 @@ test('owner can delete their recipe together with ingredients', function () {
         ->actingAs($owner)
         ->delete("/recipes/{$recipe->id}");
 
-    $response->assertRedirect(route('dashboard'));
+    $response->assertRedirect(route('recipes.index'));
 
     $this->assertDatabaseMissing('recipes', ['id' => $recipe->id]);
     $this->assertDatabaseMissing('ingredients', ['recipe_id' => $recipe->id]);
@@ -89,14 +89,23 @@ test('user cannot update a recipe they do not own', function () {
     $owner = User::factory()->create();
     $stranger = User::factory()->create();
     $recipe = Recipe::factory()->create(['user_id' => $owner->id, 'title' => 'Original Title']);
+    Ingredient::factory()->create(['recipe_id' => $recipe->id, 'name' => 'Original Ingredient']);
 
     $response = $this
         ->actingAs($stranger)
-        ->put("/recipes/{$recipe->id}", validRecipePayload(['title' => 'Hijacked']));
+        ->put("/recipes/{$recipe->id}", validRecipePayload([
+            'title' => 'Hijacked',
+            'ingredients' => [
+                ['name' => 'Hijacked Ingredient', 'quantity' => 1, 'unit' => 'g'],
+            ],
+        ]));
 
     $response->assertForbidden();
 
+    // Отказ происходит до Task — не меняется ни сам рецепт, ни его ингредиенты.
     $this->assertDatabaseHas('recipes', ['id' => $recipe->id, 'title' => 'Original Title']);
+    $this->assertDatabaseHas('ingredients', ['recipe_id' => $recipe->id, 'name' => 'Original Ingredient']);
+    $this->assertDatabaseMissing('ingredients', ['recipe_id' => $recipe->id, 'name' => 'Hijacked Ingredient']);
 });
 
 test('user cannot delete a recipe they do not own', function () {
@@ -117,11 +126,19 @@ test('recipe owner cannot be spoofed through the payload', function () {
     $user = User::factory()->create();
     $other = User::factory()->create();
 
+    // Первый слой защиты: user_id не описан правилами, а validated() отдаёт
+    // только те ключи, для которых правила есть — значит владелец из ввода не пройдёт.
+    expect((new StoreRecipeRequest())->rules())->not->toHaveKey('user_id');
+
+    // Второй слой защиты: даже просочившийся user_id не входит в $fillable модели.
+    expect((new Recipe())->getFillable())->not->toContain('user_id');
+
     $response = $this
         ->actingAs($user)
         ->post('/recipes', validRecipePayload(['user_id' => $other->id]));
 
-    $response->assertRedirect(route('dashboard'));
+    $recipe = Recipe::query()->where('title', 'Pumpkin Soup')->firstOrFail();
+    $response->assertRedirect(route('recipes.show', $recipe->id));
 
     $this->assertDatabaseHas('recipes', ['title' => 'Pumpkin Soup', 'user_id' => $user->id]);
     $this->assertDatabaseMissing('recipes', ['title' => 'Pumpkin Soup', 'user_id' => $other->id]);
@@ -133,6 +150,16 @@ test('updating a missing recipe returns 404', function () {
     $response = $this
         ->actingAs($user)
         ->put('/recipes/999999', validRecipePayload());
+
+    $response->assertNotFound();
+});
+
+test('deleting a missing recipe returns 404', function () {
+    $user = User::factory()->create();
+
+    $response = $this
+        ->actingAs($user)
+        ->delete('/recipes/999999');
 
     $response->assertNotFound();
 });

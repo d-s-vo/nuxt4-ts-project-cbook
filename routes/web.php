@@ -23,6 +23,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Порядок важен: статичный /recipes/create объявляется до параметра {recipe},
+    // иначе «create» уйдёт в show как идентификатор.
+    Route::get('/recipes', [RecipeController::class, 'index'])->name('recipes.index');
+    Route::get('/recipes/create', [RecipeController::class, 'create'])->name('recipes.create');
+    Route::get('/recipes/{recipe}', [RecipeController::class, 'show'])
+        ->whereNumber('recipe')->name('recipes.show');
+    Route::get('/recipes/{recipe}/edit', [RecipeController::class, 'edit'])
+        ->whereNumber('recipe')->name('recipes.edit');
+
     Route::post('/recipes', [RecipeController::class, 'store'])->name('recipes.store');
     Route::put('/recipes/{recipe}', [RecipeController::class, 'update'])
         ->whereNumber('recipe')->name('recipes.update');

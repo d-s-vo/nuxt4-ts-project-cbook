@@ -26,6 +26,15 @@ export default tseslint.config(
         },
     },
     {
+        // TypeScript already resolves identifiers (including ambient globals such
+        // as the generated `App.*` namespace), and vue-tsc enforces it on build,
+        // so `no-undef` is redundant here and produces false positives.
+        files: ['**/*.ts', '**/*.tsx', '**/*.vue'],
+        rules: {
+            'no-undef': 'off',
+        },
+    },
+    {
         languageOptions: {
             globals: {
                 // Ziggy exposes route() as a global helper (see resources/js/types/global.d.ts).
