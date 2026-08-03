@@ -14,6 +14,16 @@ test('profile page is displayed', function () {
     $response->assertOk();
 });
 
+test('unverified user is redirected to the verification notice from profile', function () {
+    $user = User::factory()->unverified()->create();
+
+    $response = $this
+        ->actingAs($user)
+        ->get('/profile');
+
+    $response->assertRedirect(route('verification.notice'));
+});
+
 test('profile information can be updated', function () {
     $user = User::factory()->create();
 
