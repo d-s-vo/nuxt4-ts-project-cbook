@@ -122,6 +122,35 @@ test('user cannot delete a recipe they do not own', function () {
     $this->assertDatabaseHas('recipes', ['id' => $recipe->id]);
 });
 
+test('an administrator may update a recipe owned by someone else', function () {
+    $owner = User::factory()->create();
+    $admin = User::factory()->admin()->create();
+    $recipe = Recipe::factory()->create(['user_id' => $owner->id, 'title' => 'Original Title']);
+
+    $response = $this
+        ->actingAs($admin)
+        ->put("/recipes/{$recipe->id}", validRecipePayload(['title' => 'Edited by admin']));
+
+    $response->assertSessionHasNoErrors();
+    $this->assertDatabaseHas('recipes', ['id' => $recipe->id, 'title' => 'Edited by admin']);
+
+    // Владелец не меняется — админ правит чужой рецепт, не присваивая его себе.
+    $this->assertDatabaseHas('recipes', ['id' => $recipe->id, 'user_id' => $owner->id]);
+});
+
+test('an administrator may delete a recipe owned by someone else', function () {
+    $owner = User::factory()->create();
+    $admin = User::factory()->admin()->create();
+    $recipe = Recipe::factory()->create(['user_id' => $owner->id]);
+
+    $this
+        ->actingAs($admin)
+        ->delete("/recipes/{$recipe->id}")
+        ->assertSessionHasNoErrors();
+
+    $this->assertDatabaseMissing('recipes', ['id' => $recipe->id]);
+});
+
 test('recipe owner cannot be spoofed through the payload', function () {
     $user = User::factory()->create();
     $other = User::factory()->create();

@@ -9,6 +9,7 @@ export default tseslint.config(
             'vendor',
             'node_modules',
             'public/build',
+            'public/js/filament',
             'resources/js/types/generated.d.ts',
         ],
     },

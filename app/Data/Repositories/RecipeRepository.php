@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Data\Repositories;
 
 use App\Data\RecipeData;
+use App\Models\Ingredient;
 use App\Models\Recipe;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -67,5 +68,23 @@ final class RecipeRepository extends BaseRepository
     public function delete(int $id): void
     {
         Recipe::query()->findOrFail($id)->delete();
+    }
+
+    /**
+     * Ингредиенты рецепта в форме, пригодной для заполнения формы админ-панели.
+     *
+     * @return array<int, array{name: string, quantity: float, unit: string}>
+     */
+    public function ingredientsAsFormData(int $recipeId): array
+    {
+        $recipe = Recipe::query()->with('ingredients')->findOrFail($recipeId);
+
+        return $recipe->ingredients
+            ->map(fn (Ingredient $ingredient): array => [
+                'name' => $ingredient->name,
+                'quantity' => $ingredient->quantity,
+                'unit' => $ingredient->unit,
+            ])
+            ->all();
     }
 }

@@ -13,6 +13,16 @@ use App\Models\User;
  */
 final class RecipePolicy
 {
+    /**
+     * Администратор управляет всеми рецептами через админ-панель — осознанный супер-доступ
+     * поверх проверки владельца. Для обычных пользователей возвращаем null: решение остаётся
+     * за конкретными методами (owner-scoping не ослабляется).
+     */
+    public function before(User $user, string $ability): ?bool
+    {
+        return $user->is_admin ? true : null;
+    }
+
     public function viewAny(User $user): bool
     {
         return true;
